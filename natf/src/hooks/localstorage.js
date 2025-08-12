@@ -35,6 +35,7 @@ export function useLocalStorage(key, initialValue) {
 
 // Data management hook - designed to be easily replaceable with API calls later
 export function useNoteData() {
+    const initialListName = 'Simple Todo App'
     const initialData = [
         {
             id: 1,
@@ -57,6 +58,22 @@ export function useNoteData() {
     ];
 
     const [noteBlocks, setNoteBlocks, clearNoteBlocks] = useLocalStorage('noteBlocks', initialData);
+    const [appConfig, setAppConfig, clearAppConfig] = useLocalStorage('appConfig', {
+        title: 'Simple Todo App',
+        metadata: { created: new Date().toISOString(), updated: new Date().toISOString() }
+    });
+
+    const updateAppConfig = useCallback((updates) => {
+        setAppConfig(prev => ({
+            ...prev,
+            ...updates,
+            metadata: {
+                ...prev.metadata,
+                updated: new Date().toISOString()
+            }
+        }));
+    }, [setAppConfig]);
+
     const createNoteBlock = useCallback((blockData) => {
         const newId = Date.now();
         const newBlock = {
@@ -166,25 +183,34 @@ export function useNoteData() {
     // Utility functions
     const exportData = useCallback(() => {
         return {
+            appConfig,
             exportDate: new Date().toISOString(),
             version: '1.0',
             noteBlocks: noteBlocks
         };
-    }, [noteBlocks]);
+    }, [noteBlocks,appConfig]);
 
     const importData = useCallback((data) => {
         if (data.noteBlocks && Array.isArray(data.noteBlocks)) {
             setNoteBlocks(data.noteBlocks);
+            if (data.appConfig) {
+                setAppConfig(data.appConfig)
+            }
             return true;
         }
         return false;
-    }, [setNoteBlocks]);
+    }, [setNoteBlocks,setAppConfig]);
 
     const clearAllData = useCallback(() => {
+        clearAppConfig()
         clearNoteBlocks();
-    }, [clearNoteBlocks]);
+    }, [clearNoteBlocks, clearAppConfig]);
 
     return {
+        //app config
+        appConfig,
+        updateAppConfig,
+
         // Data
         noteBlocks,
 

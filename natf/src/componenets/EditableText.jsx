@@ -1,7 +1,7 @@
 import React, { useRef, useEffect } from 'react';
 import { useEditable } from '../hooks/useEditable';
 
-export function EditableText({ as: Component = 'span', initialValue = '' }) {
+export function EditableText({ as: Component = 'span', initialValue = '', onCustomChange }) {
     const {
         isEditing,
         value,
@@ -18,6 +18,7 @@ export function EditableText({ as: Component = 'span', initialValue = '' }) {
         if (inputRef.current) {
             inputRef.current.style.width = inputRef.current.scrollWidth + 'px';
         }
+        typeof(onCustomChange) === 'function' && onCustomChange(value)
     }, [value]);
 
     return isEditing ? (
