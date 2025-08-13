@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { NoteModal } from "./NoteModal";
-import { EditableText } from "./EditableText";
 
 export function Note({ block, dataManager }) {
     const [modalOpen, setModalOpen] = useState(false);

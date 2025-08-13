@@ -1,13 +1,9 @@
 import { Note } from './Note';
 import { useNoteData } from '../hooks/localstorage';
-import { useEffect } from 'react';
 
 export default function TodoApp({ workspaceId, workspaceManager }) {
   const dataManager = useNoteData(workspaceId);
 
-  useEffect(() => {
-
-  }, [workspaceId])
   const exportToText = () => {
     let text = `${dataManager.appConfig.title.toUpperCase()} - EXPORT\n`;
     text += '='.repeat(Math.max(dataManager.appConfig.title.length + 10, 20)) + '\n\n';
@@ -27,11 +23,11 @@ export default function TodoApp({ workspaceId, workspaceManager }) {
           const status = note.metadata.completed ? '[✓]' : '[ ]';
           text += `${status} [${note.priority.toUpperCase()}] ${note.head}\n`;
           if (note.note) {
-            text += `    ${note.note}\n`;
+            text += `${note.note}\n`;
           }
-          text += `    Created: ${new Date(note.metadata.created).toLocaleString()}\n`;
+          text += `Created: ${new Date(note.metadata.created).toLocaleString()}\n`;
           if (note.metadata.updated !== note.metadata.created) {
-            text += `    Updated: ${new Date(note.metadata.updated).toLocaleString()}\n`;
+            text += `Updated: ${new Date(note.metadata.updated).toLocaleString()}\n`;
           }
           text += '\n';
         });
