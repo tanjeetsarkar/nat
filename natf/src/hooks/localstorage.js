@@ -1,6 +1,7 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 export function useLocalStorage(key, initialValue) {
+
     const [storedValue, setStoredValue] = useState(() => {
         try {
             const item = window.localStorage.getItem(key);
@@ -10,6 +11,17 @@ export function useLocalStorage(key, initialValue) {
             return initialValue;
         }
     });
+
+    useEffect(() => {
+        try {
+            const item = window.localStorage.getItem(key);
+            const value = item ? JSON.parse(item) : initialValue;
+            setStoredValue(value);
+        } catch (error) {
+            console.error(`Error loading ${key} from localStorage:`, error);
+            setStoredValue(initialValue);
+        }
+    }, [key]);
 
     const setValue = useCallback((value) => {
         try {
@@ -33,47 +45,54 @@ export function useLocalStorage(key, initialValue) {
     return [storedValue, setValue, removeValue];
 }
 
-// Data management hook - designed to be easily replaceable with API calls later
-export function useNoteData() {
-    const initialListName = 'Simple Todo App'
-    const initialData = [
-        {
-            id: 1,
-            head: 'Sample Note Block',
-            metadata: { created: new Date().toISOString(), updated: new Date().toISOString() },
-            notes: [
-                {
-                    id: 1,
-                    priority: 'high',
-                    head: 'Sample Todo Item',
-                    note: 'This is a sample todo item description',
-                    metadata: {
-                        created: new Date().toISOString(),
-                        updated: new Date().toISOString(),
-                        completed: false
-                    }
-                }
-            ]
-        }
-    ];
+export function useNoteData(workspaceId) {
+    const storageKey = `workspace_data_${workspaceId}`;
 
-    const [noteBlocks, setNoteBlocks, clearNoteBlocks] = useLocalStorage('noteBlocks', initialData);
-    const [appConfig, setAppConfig, clearAppConfig] = useLocalStorage('appConfig', {
-        title: 'Simple Todo App',
-        metadata: { created: new Date().toISOString(), updated: new Date().toISOString() }
-    });
+
+    const initialData = {
+        noteBlocks: [
+            {
+                id: 1,
+                head: 'Sample Note Block',
+                metadata: { created: new Date().toISOString(), updated: new Date().toISOString() },
+                notes: [
+                    {
+                        id: 1,
+                        priority: 'high',
+                        head: 'Sample Todo Item',
+                        note: 'This is a sample todo item description',
+                        metadata: {
+                            created: new Date().toISOString(),
+                            updated: new Date().toISOString(),
+                            completed: false
+                        }
+                    }
+                ]
+            }
+        ],
+        appConfig: {
+            title: 'Simple Todo App',
+            metadata: { created: new Date().toISOString(), updated: new Date().toISOString() }
+        }
+    };
+
+    const [workspaceData, setWorkspaceData] = useLocalStorage(storageKey, initialData);
 
     const updateAppConfig = useCallback((updates) => {
-        setAppConfig(prev => ({
+        setWorkspaceData(prev => ({
             ...prev,
-            ...updates,
-            metadata: {
-                ...prev.metadata,
-                updated: new Date().toISOString()
+            appConfig: {
+                ...prev.appConfig,
+                ...updates,
+                metadata: {
+                    ...prev.appConfig.metadata,
+                    updated: new Date().toISOString()
+                }
             }
         }));
-    }, [setAppConfig]);
+    }, [setWorkspaceData]);
 
+    // Note Block operations
     const createNoteBlock = useCallback((blockData) => {
         const newId = Date.now();
         const newBlock = {
@@ -85,28 +104,38 @@ export function useNoteData() {
             },
             notes: []
         };
-        setNoteBlocks(prev => [...prev, newBlock]);
+
+        setWorkspaceData(prev => ({
+            ...prev,
+            noteBlocks: [...prev.noteBlocks, newBlock]
+        }));
         return newBlock;
-    }, [setNoteBlocks]);
+    }, [setWorkspaceData]);
 
     const updateNoteBlock = useCallback((blockId, updates) => {
-        setNoteBlocks(prev => prev.map(block =>
-            block.id === blockId
-                ? {
-                    ...block,
-                    ...updates,
-                    metadata: {
-                        ...block.metadata,
-                        updated: new Date().toISOString()
+        setWorkspaceData(prev => ({
+            ...prev,
+            noteBlocks: prev.noteBlocks.map(block =>
+                block.id === blockId
+                    ? {
+                        ...block,
+                        ...updates,
+                        metadata: {
+                            ...block.metadata,
+                            updated: new Date().toISOString()
+                        }
                     }
-                }
-                : block
-        ));
-    }, [setNoteBlocks]);
+                    : block
+            )
+        }));
+    }, [setWorkspaceData]);
 
     const deleteNoteBlock = useCallback((blockId) => {
-        setNoteBlocks(prev => prev.filter(block => block.id !== blockId));
-    }, [setNoteBlocks]);
+        setWorkspaceData(prev => ({
+            ...prev,
+            noteBlocks: prev.noteBlocks.filter(block => block.id !== blockId)
+        }));
+    }, [setWorkspaceData]);
 
     // Note operations
     const createNote = useCallback((blockId, noteData) => {
@@ -123,96 +152,100 @@ export function useNoteData() {
             }
         };
 
-        setNoteBlocks(prev => prev.map(block =>
-            block.id === blockId
-                ? {
-                    ...block,
-                    notes: [...block.notes, newNote],
-                    metadata: {
-                        ...block.metadata,
-                        updated: new Date().toISOString()
+        setWorkspaceData(prev => ({
+            ...prev,
+            noteBlocks: prev.noteBlocks.map(block =>
+                block.id === blockId
+                    ? {
+                        ...block,
+                        notes: [...block.notes, newNote],
+                        metadata: {
+                            ...block.metadata,
+                            updated: new Date().toISOString()
+                        }
                     }
-                }
-                : block
-        ));
+                    : block
+            )
+        }));
         return newNote;
-    }, [setNoteBlocks]);
+    }, [setWorkspaceData]);
 
     const updateNote = useCallback((blockId, noteId, updates) => {
-        setNoteBlocks(prev => prev.map(block =>
-            block.id === blockId
-                ? {
-                    ...block,
-                    notes: block.notes.map(note =>
-                        note.id === noteId
-                            ? {
-                                ...note,
-                                ...updates,
-                                metadata: {
-                                    ...note.metadata,
-                                    ...((updates.completed !== undefined) ? { completed: updates.completed } : {}),
-                                    updated: new Date().toISOString()
+        setWorkspaceData(prev => ({
+            ...prev,
+            noteBlocks: prev.noteBlocks.map(block =>
+                block.id === blockId
+                    ? {
+                        ...block,
+                        notes: block.notes.map(note =>
+                            note.id === noteId
+                                ? {
+                                    ...note,
+                                    ...updates,
+                                    metadata: {
+                                        ...note.metadata,
+                                        ...((updates.completed !== undefined) ? { completed: updates.completed } : {}),
+                                        updated: new Date().toISOString()
+                                    }
                                 }
-                            }
-                            : note
-                    ),
-                    metadata: {
-                        ...block.metadata,
-                        updated: new Date().toISOString()
+                                : note
+                        ),
+                        metadata: {
+                            ...block.metadata,
+                            updated: new Date().toISOString()
+                        }
                     }
-                }
-                : block
-        ));
-    }, [setNoteBlocks]);
+                    : block
+            )
+        }));
+    }, [setWorkspaceData]);
 
     const deleteNote = useCallback((blockId, noteId) => {
-        setNoteBlocks(prev => prev.map(block =>
-            block.id === blockId
-                ? {
-                    ...block,
-                    notes: block.notes.filter(note => note.id !== noteId),
-                    metadata: {
-                        ...block.metadata,
-                        updated: new Date().toISOString()
+        setWorkspaceData(prev => ({
+            ...prev,
+            noteBlocks: prev.noteBlocks.map(block =>
+                block.id === blockId
+                    ? {
+                        ...block,
+                        notes: block.notes.filter(note => note.id !== noteId),
+                        metadata: {
+                            ...block.metadata,
+                            updated: new Date().toISOString()
+                        }
                     }
-                }
-                : block
-        ));
-    }, [setNoteBlocks]);
+                    : block
+            )
+        }));
+    }, [setWorkspaceData]);
 
     // Utility functions
     const exportData = useCallback(() => {
         return {
-            appConfig,
             exportDate: new Date().toISOString(),
             version: '1.0',
-            noteBlocks: noteBlocks
+            appConfig: workspaceData.appConfig,
+            noteBlocks: workspaceData.noteBlocks
         };
-    }, [noteBlocks,appConfig]);
+    }, [workspaceData]);
 
     const importData = useCallback((data) => {
         if (data.noteBlocks && Array.isArray(data.noteBlocks)) {
-            setNoteBlocks(data.noteBlocks);
-            if (data.appConfig) {
-                setAppConfig(data.appConfig)
-            }
+            setWorkspaceData({
+                noteBlocks: data.noteBlocks,
+                appConfig: data.appConfig || workspaceData.appConfig
+            });
             return true;
         }
         return false;
-    }, [setNoteBlocks,setAppConfig]);
-
-    const clearAllData = useCallback(() => {
-        clearAppConfig()
-        clearNoteBlocks();
-    }, [clearNoteBlocks, clearAppConfig]);
+    }, [setWorkspaceData, workspaceData.appConfig]);
 
     return {
-        //app config
-        appConfig,
-        updateAppConfig,
-
         // Data
-        noteBlocks,
+        noteBlocks: workspaceData.noteBlocks,
+        appConfig: workspaceData.appConfig,
+
+        // App Config operations
+        updateAppConfig,
 
         // Note Block operations
         createNoteBlock,
@@ -226,7 +259,6 @@ export function useNoteData() {
 
         // Utility operations
         exportData,
-        importData,
-        clearAllData
+        importData
     };
 }

@@ -1,12 +1,16 @@
 import { Note } from './Note';
 import { useNoteData } from '../hooks/localstorage';
+import { useEffect } from 'react';
 
-export default function TodoApp() {
-  const dataManager = useNoteData();
+export default function TodoApp({ workspaceId, workspaceManager }) {
+  const dataManager = useNoteData(workspaceId);
 
+  useEffect(() => {
+
+  }, [workspaceId])
   const exportToText = () => {
-    let text = `${dataManager.listName}\n`;
-    text += '================\n\n';
+    let text = `${dataManager.appConfig.title.toUpperCase()} - EXPORT\n`;
+    text += '='.repeat(Math.max(dataManager.appConfig.title.length + 10, 20)) + '\n\n';
 
     dataManager.noteBlocks.forEach(block => {
       text += `## ${block.head}\n`;
@@ -23,11 +27,11 @@ export default function TodoApp() {
           const status = note.metadata.completed ? '[✓]' : '[ ]';
           text += `${status} [${note.priority.toUpperCase()}] ${note.head}\n`;
           if (note.note) {
-            text += `${note.note}\n`;
+            text += `    ${note.note}\n`;
           }
-          text += `Created: ${new Date(note.metadata.created).toLocaleString()}\n`;
+          text += `    Created: ${new Date(note.metadata.created).toLocaleString()}\n`;
           if (note.metadata.updated !== note.metadata.created) {
-            text += `Updated: ${new Date(note.metadata.updated).toLocaleString()}\n`;
+            text += `    Updated: ${new Date(note.metadata.updated).toLocaleString()}\n`;
           }
           text += '\n';
         });
@@ -46,21 +50,34 @@ export default function TodoApp() {
     URL.revokeObjectURL(url);
   };
 
-  const exportToJSON = () => {
+  const exportCurrentWorkspace = () => {
     const data = dataManager.exportData();
+    const currentWorkspace = workspaceManager.workspaces.list.find(ws => ws.id === workspaceId);
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `todo-data-${new Date().toISOString().split('T')[0]}.json`;
+    a.download = `${currentWorkspace?.name || 'workspace'}-${new Date().toISOString().split('T')[0]}.json`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
   };
 
+  const exportAllWorkspaces = () => {
+    const data = workspaceManager.exportAllWorkspaces();
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `all-workspaces-${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
 
-  const importFromJSON = () => {
+  const importToCurrentWorkspace = () => {
     const fileInput = document.createElement('input');
     fileInput.type = 'file';
     fileInput.accept = '.json';
@@ -75,23 +92,36 @@ export default function TodoApp() {
         try {
           const importedData = JSON.parse(e.target.result);
 
-          // Validate the imported data structure
-          if (!importedData.noteBlocks || !Array.isArray(importedData.noteBlocks)) {
-            alert('Invalid JSON format. Please ensure the file contains valid todo app data.');
-            return;
-          }
+          // Check if it's a single workspace or all workspaces
+          if (importedData.workspaces) {
+            // This is an all-workspaces export
+            const confirmImport = window.confirm(
+              'This file contains multiple workspaces. This will replace ALL your current workspaces. Are you sure you want to continue?'
+            );
 
-          // Confirm before importing (this will replace all current data)
-          const confirmImport = window.confirm(
-            'This will replace all your current data with the imported data. Are you sure you want to continue?'
-          );
+            if (confirmImport) {
+              const success = workspaceManager.importAllWorkspaces(importedData);
+              if (success) {
+                alert('All workspaces imported successfully!');
+              } else {
+                alert('Failed to import workspaces. Please check the file format.');
+              }
+            }
+          } else {
+            // This is a single workspace export
+            const confirmImport = window.confirm(
+              'This will replace the current workspace data. Are you sure you want to continue?'
+            );
 
-          if (confirmImport) {
-            const success = dataManager.importData(importedData);
-            if (success) {
-              alert('Data imported successfully!');
-            } else {
-              alert('Failed to import data. Please check the file format.');
+            if (confirmImport) {
+              const success = dataManager.importData(importedData);
+              if (success) {
+                alert('Workspace imported successfully!');
+                // Update workspace last modified time
+                workspaceManager.updateWorkspace(workspaceId, {});
+              } else {
+                alert('Failed to import data. Please check the file format.');
+              }
             }
           }
         } catch (error) {
@@ -134,6 +164,11 @@ export default function TodoApp() {
             borderRadius: '4px'
           }}
         />
+        {dataManager.appConfig.metadata.updated !== dataManager.appConfig.metadata.created && (
+          <div style={{ fontSize: '12px', color: '#888', marginBottom: '15px' }}>
+            Title last updated: {new Date(dataManager.appConfig.metadata.updated).toLocaleString()}
+          </div>
+        )}
         <div style={{ marginBottom: '10px' }}>
           <button
             onClick={() => dataManager.createNoteBlock()}
@@ -160,7 +195,7 @@ export default function TodoApp() {
             Export to Text
           </button>
           <button
-            onClick={exportToJSON}
+            onClick={exportCurrentWorkspace}
             style={{
               padding: '8px 16px',
               border: '1px solid #666',
@@ -169,10 +204,22 @@ export default function TodoApp() {
               marginRight: '10px'
             }}
           >
-            Export JSON
+            Export Current
           </button>
           <button
-            onClick={importFromJSON}
+            onClick={exportAllWorkspaces}
+            style={{
+              padding: '8px 16px',
+              border: '1px solid #666',
+              backgroundColor: '#f8f0e8',
+              cursor: 'pointer',
+              marginRight: '10px'
+            }}
+          >
+            Export All
+          </button>
+          <button
+            onClick={importToCurrentWorkspace}
             style={{
               padding: '8px 16px',
               border: '1px solid #666',
@@ -183,11 +230,6 @@ export default function TodoApp() {
             Import JSON
           </button>
         </div>
-        {dataManager.appConfig.metadata.updated !== dataManager.appConfig.metadata.created && (
-          <div style={{ fontSize: '12px', color: '#888' }}>
-            Title last updated: {new Date(dataManager.appConfig.metadata.updated).toLocaleString()}
-          </div>
-        )}
       </div>
 
       <div style={{
