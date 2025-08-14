@@ -1,8 +1,8 @@
-import { useEffect } from 'react';
 import './App.css'
 import TodoApp from './componenets/NoteBlock'
 import { WorkspaceTabs } from './componenets/WorkspaceTabs'
 import { useWorkspaceManager } from './hooks/workspaceManagement';
+import { AutoSyncSettings } from './componenets/AutosyncSettings';
 
 function App() {
   const workspaceManager = useWorkspaceManager();
@@ -13,6 +13,9 @@ function App() {
         minHeight: '100vh',
         backgroundColor: '#fafafa'
       }}>
+        <AutoSyncSettings
+          workspaceName={"workspace-backup"}
+        />
         <div style={{
           backgroundColor: 'white',
           borderBottom: '2px solid #eee',

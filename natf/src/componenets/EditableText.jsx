@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import { useRef, useEffect } from 'react';
 import { useEditable } from '../hooks/useEditable';
 
 export function EditableText({ as: Component = 'span', initialValue = '', onCustomChange }) {
