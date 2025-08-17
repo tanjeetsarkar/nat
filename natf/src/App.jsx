@@ -10,24 +10,26 @@ function App() {
     <>
       <div style={{
         fontFamily: 'Arial, sans-serif',
-        minHeight: '100vh',
+        maxHeight: '100vh',
         backgroundColor: '#fafafa'
       }}>
-        <AutoSyncSettings
-          workspaceName={"workspace-backup"}
-        />
         <div style={{
           backgroundColor: 'white',
           borderBottom: '2px solid #eee',
-          padding: '15px 20px'
+          padding: '5px 20px'
         }}>
-          <h1 style={{
-            margin: '0 0 15px 0',
-            fontSize: '28px',
-            color: '#333'
-          }}>
-            Workspace Manager
-          </h1>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px'}}>
+            <h1 style={{
+              margin: '0 0 5px 0',
+              fontSize: '28px',
+              color: '#333'
+            }}>
+              Workspace Manager
+            </h1>
+            <AutoSyncSettings
+              workspaceName={"workspace-backup"}
+            />
+          </div>
           <WorkspaceTabs workspaceManager={workspaceManager} />
         </div>
 

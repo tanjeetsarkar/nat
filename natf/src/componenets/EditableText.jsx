@@ -19,7 +19,7 @@ export function EditableText({ as: Component = 'span', initialValue = '', onCust
             inputRef.current.style.width = inputRef.current.scrollWidth + 'px';
         }
         typeof(onCustomChange) === 'function' && onCustomChange(value)
-    }, [value]);
+    }, [value, onCustomChange]);
 
     return isEditing ? (
         <input

@@ -1,10 +1,20 @@
 import { useState } from "react";
 import { NoteModal } from "./NoteModal";
+import { closestCenter, DndContext, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
+import { SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable';
+import { SortableNotes } from "./SortableNotes";
+
 
 export function Note({ block, dataManager }) {
     const [modalOpen, setModalOpen] = useState(false);
     const [editingNote, setEditingNote] = useState(null);
     const [isNewNote, setIsNewNote] = useState(false);
+
+
+    const sensors = useSensors(
+        useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+        useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+    )
 
     const handleAddNote = () => {
         setEditingNote(null);
@@ -13,6 +23,7 @@ export function Note({ block, dataManager }) {
     };
 
     const handleEditNote = (note) => {
+        console.log("Editing Note ID", note.id)
         setEditingNote(note);
         setIsNewNote(false);
         setModalOpen(true);
@@ -26,24 +37,18 @@ export function Note({ block, dataManager }) {
         }
     };
 
-    const getPriorityColor = (priority) => {
-        switch (priority) {
-            case 'high': return '#ffebee';
-            case 'medium': return '#fff3e0';
-            case 'low': return '#e8f5e8';
-            default: return '#f5f5f5';
+
+    const handleDragEnd = (event) => {
+        const { active, over } = event;
+        console.log("Moving from", active.id, "to", over.id)
+        if (active.id !== over?.id) {
+            //   setNotes((items) => {
+            //     const oldIndex = items.findIndex((item) => item.id === active.id);
+            //     const newIndex = items.findIndex((item) => item.id === over?.id);
+            //     return arrayMove(items, oldIndex, newIndex);
+            //   });
         }
     };
-
-    const getPriorityBorder = (priority) => {
-        switch (priority) {
-            case 'high': return '#e57373';
-            case 'medium': return '#ffb74d';
-            case 'low': return '#81c784';
-            default: return '#ccc';
-        }
-    };
-
     return (
         <>
             <div style={{
@@ -108,7 +113,6 @@ export function Note({ block, dataManager }) {
                         )}
                     </div>
                 </div>
-
                 <div style={{ maxHeight: '500px', overflowY: 'auto' }}>
                     {block.notes.length === 0 ? (
                         <div style={{
@@ -120,88 +124,19 @@ export function Note({ block, dataManager }) {
                             No items in this block
                         </div>
                     ) : (
-                        block.notes.map(note => (
-                            <div key={note.id}
-                                style={{
-                                    border: `1px solid ${getPriorityBorder(note.priority)}`,
-                                    margin: '8px 0',
-                                    padding: '10px',
-                                    backgroundColor: note.metadata.completed ? '#f0f8f0' : getPriorityColor(note.priority),
-                                    cursor: 'pointer',
-                                    position: 'relative'
-                                }}
-                                onClick={() => handleEditNote(note)}
-                            >
-                                <div style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    marginBottom: '8px'
-                                }}>
-                                    <input
-                                        type="checkbox"
-                                        checked={note.metadata.completed}
-                                        onChange={(e) => dataManager.updateNote(block.id, note.id, { completed: e.target.checked })}
-                                        style={{ marginRight: '8px' }}
-                                        onClick={(e) => e.stopPropagation()}
-                                    />
-                                    <div style={{ flex: 1 }}>
-                                        <div style={{
-                                            fontWeight: 'bold',
-                                            fontSize: '14px',
-                                            textDecoration: note.metadata.completed ? 'line-through' : 'none',
-                                            marginBottom: '2px'
-                                        }}>
-                                            {note.head}
-                                        </div>
-                                        <div style={{
-                                            fontSize: '11px',
-                                            color: '#666',
-                                            textTransform: 'uppercase',
-                                            fontWeight: 'bold'
-                                        }}>
-                                            {note.priority}
-                                        </div>
-                                    </div>
-                                    <button
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            dataManager.deleteNote(block.id, note.id);
-                                        }}
-                                        style={{
-                                            padding: '2px 6px',
-                                            border: '1px solid #666',
-                                            backgroundColor: '#ffeeee',
-                                            cursor: 'pointer',
-                                            fontSize: '10px'
-                                        }}
-                                    >
-                                        Del
-                                    </button>
-                                </div>
+                        <DndContext
+                            sensors={sensors}
+                            collisionDetection={closestCenter}
+                            onDragEnd={handleDragEnd}
+                        >
+                            <SortableContext items={block.notes} strategy={verticalListSortingStrategy}>
 
-                                {note.note && (
-                                    <div style={{
-                                        fontSize: '12px',
-                                        color: '#555',
-                                        marginBottom: '6px',
-                                        lineHeight: '1.3',
-                                        whiteSpace: 'nowrap',
-                                        overflow: 'hidden',
-                                        textOverflow: 'ellipsis',
-                                        textDecoration: note.metadata.completed ? 'line-through' : 'none'
-                                    }}>
-                                        {note.note}
-                                    </div>
-                                )}
+                                {block.notes.map(note => (
+                                    <SortableNotes key={note.id} note={note} dataManager={dataManager} block={block} editNote={handleEditNote} />
+                                ))}
+                            </SortableContext>
 
-                                <div style={{ fontSize: '10px', color: '#888' }}>
-                                    Created: {new Date(note.metadata.created).toLocaleString()}
-                                    {note.metadata.updated !== note.metadata.created && (
-                                        <><br />Updated: {new Date(note.metadata.updated).toLocaleString()}</>
-                                    )}
-                                </div>
-                            </div>
-                        ))
+                        </DndContext>
                     )}
                 </div>
             </div>

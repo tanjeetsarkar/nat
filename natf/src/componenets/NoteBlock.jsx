@@ -1,5 +1,5 @@
+import { useNoteData } from '../hooks/useNoteData';
 import { Note } from './Note';
-import { useNoteData } from '../hooks/localstorage';
 
 export default function TodoApp({ workspaceId, workspaceManager }) {
   const dataManager = useNoteData(workspaceId);
