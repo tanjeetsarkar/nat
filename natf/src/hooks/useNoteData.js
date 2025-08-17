@@ -34,6 +34,8 @@ export function useNoteData(workspaceId) {
 
     const [workspaceData, setWorkspaceData] = useLocalStorage(storageKey, initialData);
 
+
+
     const updateAppConfig = useCallback((updates) => {
         setWorkspaceData(prev => ({
             ...prev,
@@ -85,6 +87,23 @@ export function useNoteData(workspaceId) {
             )
         }));
     }, [setWorkspaceData]);
+
+
+    const updateNotes = useCallback((blockId, newNotesList) => {
+
+        setWorkspaceData(prev => ({
+            ...prev,
+            noteBlocks: prev.noteBlocks.map(block => (
+                block.id == blockId
+                    ? {
+                        ...block,
+                        notes: newNotesList
+                    }
+                    : block
+            ))
+        }))
+    }, [setWorkspaceData])
+
 
     const deleteNoteBlock = useCallback((blockId) => {
         setWorkspaceData(prev => ({
@@ -212,6 +231,9 @@ export function useNoteData(workspaceId) {
         createNote,
         updateNote,
         deleteNote,
+
+        // Note List Operations
+        updateNotes,
 
         // Utility operations
         exportData,

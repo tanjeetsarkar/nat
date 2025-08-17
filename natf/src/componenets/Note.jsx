@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { NoteModal } from "./NoteModal";
 import { closestCenter, DndContext, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
-import { SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable';
+import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { SortableNotes } from "./SortableNotes";
 
 
@@ -23,7 +23,6 @@ export function Note({ block, dataManager }) {
     };
 
     const handleEditNote = (note) => {
-        console.log("Editing Note ID", note.id)
         setEditingNote(note);
         setIsNewNote(false);
         setModalOpen(true);
@@ -40,13 +39,11 @@ export function Note({ block, dataManager }) {
 
     const handleDragEnd = (event) => {
         const { active, over } = event;
-        console.log("Moving from", active.id, "to", over.id)
         if (active.id !== over?.id) {
-            //   setNotes((items) => {
-            //     const oldIndex = items.findIndex((item) => item.id === active.id);
-            //     const newIndex = items.findIndex((item) => item.id === over?.id);
-            //     return arrayMove(items, oldIndex, newIndex);
-            //   });
+            const oldIndex = block.notes.findIndex((item) => item.id === active.id);
+            const newIndex = block.notes.findIndex((item) => item.id === over?.id);
+            const newNotesList = arrayMove(block.notes, oldIndex, newIndex);
+            dataManager.updateNotes(block.id, newNotesList)
         }
     };
     return (
