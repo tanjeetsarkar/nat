@@ -8,12 +8,12 @@ export function useNoteData(workspaceId) {
     const initialData = {
         noteBlocks: [
             {
-                id: 1,
+                id: Date.now(),
                 head: 'Sample Note Block',
                 metadata: { created: new Date().toISOString(), updated: new Date().toISOString() },
                 notes: [
                     {
-                        id: 1,
+                        id: Date.now(),
                         priority: 'high',
                         head: 'Sample Todo Item',
                         note: 'This is a sample todo item description',
