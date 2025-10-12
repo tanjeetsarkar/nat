@@ -1,0 +1,574 @@
+# ============================================
+# QUERIES
+# ============================================
+
+# 1. Get all workplaces
+query GetAllWorkplaces {
+  workplaces {
+    id
+    name
+    created
+    updated
+    appData {
+      id
+      title
+      metadata {
+        created
+        updated
+      }
+    }
+  }
+}
+
+# 2. Get single workplace by ID
+query GetWorkplace {
+  workplace(id: "workspace-1") {
+    id
+    name
+    created
+    updated
+    appData {
+      id
+      title
+      metadata {
+        created
+        updated
+      }
+      blocks {
+        id
+        head
+        metadata {
+          created
+          updated
+        }
+      }
+    }
+  }
+}
+
+# 3. Get app data by ID with nested relationships
+query GetAppData {
+  appData(id: 1) {
+    id
+    workplaceId
+    title
+    metadata {
+      created
+      updated
+    }
+    workplace {
+      id
+      name
+    }
+    blocks {
+      id
+      head
+      metadata {
+        created
+        updated
+      }
+      notes {
+        id
+        priority
+        head
+        note
+        metadata {
+          created
+          updated
+          completed
+        }
+      }
+    }
+  }
+}
+
+# 4. Get note block by ID
+query GetNoteBlock {
+  noteBlock(id: 1) {
+    id
+    appId
+    head
+    metadata {
+      created
+      updated
+    }
+    appData {
+      id
+      title
+    }
+    notes {
+      id
+      priority
+      head
+      note
+      metadata {
+        created
+        updated
+        completed
+      }
+    }
+  }
+}
+
+# 5. Get single note by ID
+query GetNote {
+  note(id: 1) {
+    id
+    blockId
+    priority
+    head
+    note
+    metadata {
+      created
+      updated
+      completed
+    }
+    block {
+      id
+      head
+    }
+  }
+}
+
+# 6. Get notes by block ID
+query GetNotesByBlock {
+  notesByBlock(blockId: 1) {
+    id
+    priority
+    head
+    note
+    metadata {
+      created
+      updated
+      completed
+    }
+  }
+}
+
+# ============================================
+# MUTATIONS
+# ============================================
+
+# 1. Create Workplace
+mutation CreateWorkplace {
+  createWorkplace(input: {
+    id: "workspace-1"
+    name: "My First Workspace"
+  }) {
+    id
+    name
+    created
+    updated
+  }
+}
+
+# 2. Update Workplace
+mutation UpdateWorkplace {
+  updateWorkplace(
+    id: "workspace-421"
+    input: {
+      name: "Updated Workspace Name"
+    }
+  ) {
+    id
+    name
+    updated
+  }
+}
+
+# 3. Delete Workplace
+mutation DeleteWorkplace {
+  deleteWorkplace(id: "workspace-421")
+}
+
+# 4. Create App Data
+mutation CreateAppData {
+  createAppData(input: {
+    workplaceId: "workspace-421"
+    title: "My Todo App"
+  }) {
+    id
+    workplaceId
+    title
+    metadata {
+      created
+      updated
+    }
+  }
+}
+
+# 5. Update App Data
+mutation UpdateAppData {
+  updateAppData(
+    id: 1
+    input: {
+      title: "Updated Todo App"
+    }
+  ) {
+    id
+    title
+    metadata {
+      updated
+    }
+  }
+}
+
+# 6. Delete App Data
+mutation DeleteAppData {
+  deleteAppData(id: 1)
+}
+
+# 7. Create Note Block
+mutation CreateNoteBlock {
+  createNoteBlock(input: {
+    appId: 1
+    head: "Work Tasks"
+  }) {
+    id
+    appId
+    head
+    metadata {
+      created
+      updated
+    }
+  }
+}
+
+# 8. Update Note Block
+mutation UpdateNoteBlock {
+  updateNoteBlock(
+    id: 1
+    input: {
+      head: "Updated Work Tasks"
+    }
+  ) {
+    id
+    head
+    metadata {
+      updated
+    }
+  }
+}
+
+# 9. Delete Note Block
+mutation DeleteNoteBlock {
+  deleteNoteBlock(id: 1757746311415)
+}
+
+# 10. Create Note
+mutation CreateNote {
+  createNote(input: {
+    blockId: 1
+    priority: "high"
+    head: "Complete project documentation"
+    note: "Write comprehensive docs for the API endpoints"
+  }) {
+    id
+    blockId
+    priority
+    head
+    note
+    metadata {
+      created
+      updated
+      completed
+    }
+  }
+}
+
+# 11. Update Note
+mutation UpdateNote {
+  updateNote(
+    id: 1
+    input: {
+      priority: "medium"
+      head: "Updated task title"
+      note: "Updated task description"
+      completed: true
+    }
+  ) {
+    id
+    priority
+    head
+    note
+    metadata {
+      updated
+      completed
+    }
+  }
+}
+
+# 12. Delete Note
+mutation DeleteNote {
+  deleteNote(id: 1757746328218)
+}
+
+# 13. Import Workspaces (Complete Example)
+mutation ImportWorkspaces {
+  importWorkspaces(input: {
+    exportDate: "2025-10-12T10:00:00Z"
+    version: "1.0"
+    workspaces: [
+      {
+        id: "workspace-import-1"
+        name: "Imported Workspace"
+        created: "2025-10-01T10:00:00Z"
+        lastModified: "2025-10-12T10:00:00Z"
+        data: {
+          appConfig: {
+            title: "Imported App"
+            metadata: {
+              created: "2025-10-01T10:00:00Z"
+              updated: "2025-10-12T10:00:00Z"
+            }
+          }
+          noteBlocks: [
+            {
+              id: "1"
+              head: "Imported Block 1"
+              metadata: {
+                created: "2025-10-01T10:00:00Z"
+                updated: "2025-10-12T10:00:00Z"
+              }
+              notes: [
+                {
+                  id: "1"
+                  priority: "high"
+                  head: "Imported Note 1"
+                  note: "This is an imported note"
+                  metadata: {
+                    created: "2025-10-01T10:00:00Z"
+                    updated: "2025-10-12T10:00:00Z"
+                    completed: false
+                  }
+                },
+                {
+                  id: "2"
+                  priority: "medium"
+                  head: "Imported Note 2"
+                  note: "Another imported note"
+                  metadata: {
+                    created: "2025-10-02T10:00:00Z"
+                    updated: "2025-10-12T10:00:00Z"
+                    completed: true
+                  }
+                }
+              ]
+            },
+            {
+              id: "2"
+              head: "Imported Block 2"
+              metadata: {
+                created: "2025-10-05T10:00:00Z"
+                updated: "2025-10-12T10:00:00Z"
+              }
+              notes: [
+                {
+                  id: "3"
+                  priority: "low"
+                  head: "Imported Note 3"
+                  note: "Third imported note"
+                  metadata: {
+                    created: "2025-10-05T10:00:00Z"
+                    updated: "2025-10-12T10:00:00Z"
+                    completed: false
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      }
+    ]
+  }) {
+    id
+    name
+    created
+    updated
+    appData {
+      id
+      title
+      blocks {
+        id
+        head
+        notes {
+          id
+          priority
+          head
+          note
+          metadata {
+            completed
+          }
+        }
+      }
+    }
+  }
+}
+
+# ============================================
+# COMPLEX QUERIES WITH DEEP NESTING
+# ============================================
+
+# Full hierarchy query
+query GetCompleteWorkspaceHierarchy {
+  workplace(id: "workspace-1") {
+    id
+    name
+    created
+    updated
+    appData {
+      id
+      title
+      metadata {
+        created
+        updated
+      }
+      blocks {
+        id
+        head
+        metadata {
+          created
+          updated
+        }
+        notes {
+          id
+          priority
+          head
+          note
+          metadata {
+            created
+            updated
+            completed
+          }
+        }
+      }
+    }
+  }
+}
+
+# Query with variables example
+query GetWorkplaceWithVariable($workplaceId: String!) {
+  workplace(id: $workplaceId) {
+    id
+    name
+    appData {
+      id
+      title
+      blocks {
+        id
+        head
+      }
+    }
+  }
+}
+
+# Variables for above query:
+# {
+#   "workplaceId": "workspace-1"
+# }
+
+# Query notes with filtering by block
+query GetNotesInBlock($blockId: Int!) {
+  notesByBlock(blockId: $blockId) {
+    id
+    priority
+    head
+    metadata {
+      completed
+    }
+  }
+}
+
+# Variables:
+# {
+#   "blockId": 1
+# }
+
+# ============================================
+# TESTING WORKFLOW (Execute in order)
+# ============================================
+
+# Step 1: Create Workplace
+# Step 2: Create App Data (using workplace ID)
+# Step 3: Create Note Block (using app data ID)
+# Step 4: Create Notes (using note block ID)
+# Step 5: Query to verify all data
+# Step 6: Update operations
+# Step 7: Delete operations (in reverse order)
+
+# ============================================
+# BATCH OPERATIONS EXAMPLE
+# ============================================
+
+# Create multiple items in one request
+mutation BatchCreate {
+  workspace1: createWorkplace(input: {
+    id: "ws-batch-1"
+    name: "Batch Workspace 1"
+  }) {
+    id
+    name
+  }
+  
+  workspace2: createWorkplace(input: {
+    id: "ws-batch-2"
+    name: "Batch Workspace 2"
+  }) {
+    id
+    name
+  }
+}
+
+# Create complete structure
+mutation CreateCompleteStructure {
+  # First create workplace
+  workplace: createWorkplace(input: {
+    id: "complete-ws-1"
+    name: "Complete Structure Test"
+  }) {
+    id
+  }
+  
+  # Then create app data
+  appData: createAppData(input: {
+    workplaceId: "complete-ws-1"
+    title: "Test App"
+  }) {
+    id
+  }
+}
+
+# After getting IDs from above, create blocks and notes
+mutation CreateBlocksAndNotes {
+  block1: createNoteBlock(input: {
+    appId: 1
+    head: "Todo"
+  }) {
+    id
+  }
+  
+  block2: createNoteBlock(input: {
+    appId: 1
+    head: "In Progress"
+  }) {
+    id
+  }
+  
+  note1: createNote(input: {
+    blockId: 1
+    priority: "high"
+    head: "Task 1"
+    note: "First task"
+  }) {
+    id
+  }
+  
+  note2: createNote(input: {
+    blockId: 1
+    priority: "medium"
+    head: "Task 2"
+    note: "Second task"
+  }) {
+    id
+  }
+}

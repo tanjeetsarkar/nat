@@ -17,12 +17,22 @@ class MetadataType:
 
 @strawberry.type
 class NoteType:
-    id: int
-    block_id: int
+    id: strawberry.ID
+    block_id: strawberry.ID
     priority: Optional[str]
     head: Optional[str]
     note: Optional[str]
-    metadata: MetadataType
+    # metadata: MetadataType
+
+    @strawberry.field
+    def metadata(self) -> MetadataType:
+        m = getattr(self, "metadata_col", {})
+
+        return MetadataType(
+            created=datetime.fromisoformat(m.get("created")),
+            updated=datetime.fromisoformat(m.get("updated")),
+            completed=m.get("completed"),
+        )
 
     @strawberry.field
     async def block(self, info) -> "NoteBlockType":
@@ -36,10 +46,18 @@ class NoteType:
 
 @strawberry.type
 class NoteBlockType:
-    id: int
+    id: strawberry.ID
     app_id: int
     head: str
-    metadata: MetadataType
+    # metadata: MetadataType
+
+    @strawberry.field
+    def metadata(self) -> MetadataType:
+        m = getattr(self, "metadata_col", {})
+        return MetadataType(
+            created=datetime.fromisoformat(m.get("created")),
+            updated=datetime.fromisoformat(m.get("updated")),
+        )
 
     @strawberry.field
     async def notes(self, info) -> List[NoteType]:
@@ -61,7 +79,17 @@ class AppDataType:
     id: int
     workplace_id: str
     title: Optional[str]
-    metadata: MetadataType
+    # metadata: MetadataType
+
+    @strawberry.field
+    def metadata(self) -> MetadataType:
+        m = getattr(self, "metadata_col", {})
+        print("appdata metadata", m)
+
+        return MetadataType(
+            created=datetime.fromisoformat(m.get("created")),
+            updated=datetime.fromisoformat(m.get("updated")),
+        )
 
     @strawberry.field
     async def blocks(self, info) -> List[NoteBlockType]:
@@ -220,28 +248,28 @@ class Query:
         return result.scalars().all()
 
     @strawberry.field
-    async def app_data(self, info, id: int) -> Optional[AppDataType]:
+    async def app_data(self, info, id: strawberry.ID) -> Optional[AppDataType]:
         """Get a single app data by ID"""
         session: AsyncSession = info.context["session"]
         result = await session.execute(select(AppData).where(AppData.id == id))
         return result.scalar_one_or_none()
 
     @strawberry.field
-    async def note_block(self, info, id: int) -> Optional[NoteBlockType]:
+    async def note_block(self, info, id: strawberry.ID) -> Optional[NoteBlockType]:
         """Get a single note block by ID"""
         session: AsyncSession = info.context["session"]
         result = await session.execute(select(NoteBlock).where(NoteBlock.id == id))
         return result.scalar_one_or_none()
 
     @strawberry.field
-    async def note(self, info, id: int) -> Optional[NoteType]:
+    async def note(self, info, id: strawberry.ID) -> Optional[NoteType]:
         """Get a single note by ID"""
         session: AsyncSession = info.context["session"]
         result = await session.execute(select(Note).where(Note.id == id))
         return result.scalar_one_or_none()
 
     @strawberry.field
-    async def notes_by_block(self, info, block_id: int) -> List[NoteType]:
+    async def notes_by_block(self, info, block_id: strawberry.ID) -> List[NoteType]:
         """Get all notes in a specific block"""
         session: AsyncSession = info.context["session"]
         result = await session.execute(select(Note).where(Note.block_id == block_id))
@@ -308,7 +336,7 @@ class Mutation:
         app_data = AppData(
             workplace_id=input.workplace_id,
             title=input.title,
-            metadata_col={"created": datetime.now(), "updated": datetime.now()},
+            metadata_col={"created": datetime.now().isoformat(), "updated": datetime.now().isoformat()},
         )
         session.add(app_data)
         await session.commit()
@@ -359,7 +387,7 @@ class Mutation:
         note_block = NoteBlock(
             app_id=input.app_id,
             head=input.head,
-            metadata_col={"created": datetime.now(), "updated": datetime.now()},
+            metadata_col={"created": datetime.now().isoformat(), "updated": datetime.now().isoformat()},
         )
         session.add(note_block)
         await session.commit()
@@ -368,7 +396,7 @@ class Mutation:
 
     @strawberry.mutation
     async def update_note_block(
-        self, info, id: int, input: UpdateNoteBlockInput
+        self, info, id: strawberry.ID, input: UpdateNoteBlockInput
     ) -> Optional[NoteBlockType]:
         """Update an existing note block"""
         session: AsyncSession = info.context["session"]
@@ -387,7 +415,7 @@ class Mutation:
         return note_block
 
     @strawberry.mutation
-    async def delete_note_block(self, info, id: int) -> bool:
+    async def delete_note_block(self, info, id: strawberry.ID) -> bool:
         """Delete a note block"""
         session: AsyncSession = info.context["session"]
         result = await session.execute(select(NoteBlock).where(NoteBlock.id == id))
@@ -411,8 +439,8 @@ class Mutation:
             head=input.head,
             note=input.note,
             metadata_col={
-                "created": datetime.now(),
-                "updated": datetime.now(),
+                "created": datetime.now().isoformat(),
+                "updated": datetime.now().isoformat(),
                 "completed": False,
             },
         )
@@ -423,7 +451,7 @@ class Mutation:
 
     @strawberry.mutation
     async def update_note(
-        self, info, id: int, input: UpdateNoteInput
+        self, info, id: strawberry.ID, input: UpdateNoteInput
     ) -> Optional[NoteType]:
         """Update an existing note"""
         session: AsyncSession = info.context["session"]
@@ -449,7 +477,7 @@ class Mutation:
         return note
 
     @strawberry.mutation
-    async def delete_note(self, info, id: int) -> bool:
+    async def delete_note(self, info, id: strawberry.ID) -> bool:
         """Delete a note"""
         session: AsyncSession = info.context["session"]
         result = await session.execute(select(Note).where(Note.id == id))

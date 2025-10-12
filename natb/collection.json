@@ -1,0 +1,798 @@
+{
+  "_type": "export",
+  "__export_format": 4,
+  "__export_date": "2025-10-12T00:00:00.000Z",
+  "__export_source": "insomnia.desktop.app:v2023.5.8",
+  "resources": [
+    {
+      "_id": "req_workspace_001",
+      "parentId": "fld_queries",
+      "modified": 1697097600000,
+      "created": 1697097600000,
+      "url": "{{ _.base_url }}",
+      "name": "Get All Workplaces",
+      "description": "Fetch all workplaces with nested app data",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/graphql",
+        "text": "query GetAllWorkplaces {\n  workplaces {\n    id\n    name\n    created\n    updated\n    appData {\n      id\n      title\n      metadata {\n        created\n        updated\n      }\n    }\n  }\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1697097600000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_mut_batch_001",
+      "parentId": "fld_mutations_batch",
+      "modified": 1697097600000,
+      "created": 1697097600000,
+      "url": "{{ _.base_url }}",
+      "name": "Batch Create Workplaces",
+      "description": "Create multiple workplaces in one request",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/graphql",
+        "text": "mutation BatchCreate {\n  workspace1: createWorkplace(input: {\n    id: \"ws-batch-1\"\n    name: \"Batch Workspace 1\"\n  }) {\n    id\n    name\n  }\n  \n  workspace2: createWorkplace(input: {\n    id: \"ws-batch-2\"\n    name: \"Batch Workspace 2\"\n  }) {\n    id\n    name\n  }\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1697097600000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "fld_queries",
+      "parentId": "wrk_main",
+      "modified": 1697097600000,
+      "created": 1697097600000,
+      "name": "Queries",
+      "description": "",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": -1697097600000,
+      "_type": "request_group"
+    },
+    {
+      "_id": "fld_mutations_workplace",
+      "parentId": "wrk_main",
+      "modified": 1697097600000,
+      "created": 1697097600000,
+      "name": "Mutations - Workplace",
+      "description": "",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": -1697097590000,
+      "_type": "request_group"
+    },
+    {
+      "_id": "fld_mutations_appdata",
+      "parentId": "wrk_main",
+      "modified": 1697097600000,
+      "created": 1697097600000,
+      "name": "Mutations - AppData",
+      "description": "",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": -1697097580000,
+      "_type": "request_group"
+    },
+    {
+      "_id": "fld_mutations_noteblock",
+      "parentId": "wrk_main",
+      "modified": 1697097600000,
+      "created": 1697097600000,
+      "name": "Mutations - NoteBlock",
+      "description": "",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": -1697097570000,
+      "_type": "request_group"
+    },
+    {
+      "_id": "fld_mutations_note",
+      "parentId": "wrk_main",
+      "modified": 1697097600000,
+      "created": 1697097600000,
+      "name": "Mutations - Note",
+      "description": "",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": -1697097560000,
+      "_type": "request_group"
+    },
+    {
+      "_id": "fld_mutations_import",
+      "parentId": "wrk_main",
+      "modified": 1697097600000,
+      "created": 1697097600000,
+      "name": "Mutations - Import",
+      "description": "",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": -1697097550000,
+      "_type": "request_group"
+    },
+    {
+      "_id": "fld_mutations_batch",
+      "parentId": "wrk_main",
+      "modified": 1697097600000,
+      "created": 1697097600000,
+      "name": "Mutations - Batch Operations",
+      "description": "",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": -1697097540000,
+      "_type": "request_group"
+    },
+    {
+      "_id": "wrk_main",
+      "parentId": null,
+      "modified": 1697097600000,
+      "created": 1697097600000,
+      "name": "GraphQL API - Complete Test Suite",
+      "description": "Comprehensive GraphQL API testing collection with queries, mutations, and batch operations",
+      "scope": "collection",
+      "_type": "workspace"
+    },
+    {
+      "_id": "env_main",
+      "parentId": "wrk_main",
+      "modified": 1697097600000,
+      "created": 1697097600000,
+      "name": "Base Environment",
+      "data": {
+        "base_url": "http://localhost:8000/graphql"
+      },
+      "dataPropertyOrder": {
+        "&": ["base_url"]
+      },
+      "color": null,
+      "isPrivate": false,
+      "metaSortKey": 1697097600000,
+      "_type": "environment"
+    },
+    {
+      "_id": "jar_cookies",
+      "parentId": "wrk_main",
+      "modified": 1697097600000,
+      "created": 1697097600000,
+      "name": "Default Jar",
+      "cookies": [],
+      "_type": "cookie_jar"
+    },
+    {
+      "_id": "req_workspace_002",
+      "parentId": "fld_queries",
+      "modified": 1697097600000,
+      "created": 1697097600000,
+      "url": "{{ _.base_url }}",
+      "name": "Get Single Workplace",
+      "description": "Get workplace by ID with full nested data",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/graphql",
+        "text": "query GetWorkplace($workplaceId: String!) {\n  workplace(id: $workplaceId) {\n    id\n    name\n    created\n    updated\n    appData {\n      id\n      title\n      metadata {\n        created\n        updated\n      }\n      blocks {\n        id\n        head\n        metadata {\n          created\n          updated\n        }\n      }\n    }\n  }\n}",
+        "variables": "{\n  \"workplaceId\": \"workspace-1\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1697097590000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_appdata_001",
+      "parentId": "fld_queries",
+      "modified": 1697097600000,
+      "created": 1697097600000,
+      "url": "{{ _.base_url }}",
+      "name": "Get App Data",
+      "description": "Get app data with full relationships",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/graphql",
+        "text": "query GetAppData($appId: Int!) {\n  appData(id: $appId) {\n    id\n    workplaceId\n    title\n    metadata {\n      created\n      updated\n    }\n    workplace {\n      id\n      name\n    }\n    blocks {\n      id\n      head\n      metadata {\n        created\n        updated\n      }\n      notes {\n        id\n        priority\n        head\n        note\n        metadata {\n          created\n          updated\n          completed\n        }\n      }\n    }\n  }\n}",
+        "variables": "{\n  \"appId\": 1\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1697097580000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_noteblock_001",
+      "parentId": "fld_queries",
+      "modified": 1697097600000,
+      "created": 1697097600000,
+      "url": "{{ _.base_url }}",
+      "name": "Get Note Block",
+      "description": "Get note block with notes",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/graphql",
+        "text": "query GetNoteBlock($blockId: Int!) {\n  noteBlock(id: $blockId) {\n    id\n    appId\n    head\n    metadata {\n      created\n      updated\n    }\n    appData {\n      id\n      title\n    }\n    notes {\n      id\n      priority\n      head\n      note\n      metadata {\n        created\n        updated\n        completed\n      }\n    }\n  }\n}",
+        "variables": "{\n  \"blockId\": 1\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1697097570000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_note_001",
+      "parentId": "fld_queries",
+      "modified": 1697097600000,
+      "created": 1697097600000,
+      "url": "{{ _.base_url }}",
+      "name": "Get Single Note",
+      "description": "Get note by ID",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/graphql",
+        "text": "query GetNote($noteId: Int!) {\n  note(id: $noteId) {\n    id\n    blockId\n    priority\n    head\n    note\n    metadata {\n      created\n      updated\n      completed\n    }\n    block {\n      id\n      head\n    }\n  }\n}",
+        "variables": "{\n  \"noteId\": 1\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1697097560000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_note_002",
+      "parentId": "fld_queries",
+      "modified": 1697097600000,
+      "created": 1697097600000,
+      "url": "{{ _.base_url }}",
+      "name": "Get Notes By Block",
+      "description": "Get all notes in a specific block",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/graphql",
+        "text": "query GetNotesByBlock($blockId: Int!) {\n  notesByBlock(blockId: $blockId) {\n    id\n    priority\n    head\n    note\n    metadata {\n      created\n      updated\n      completed\n    }\n  }\n}",
+        "variables": "{\n  \"blockId\": 1\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1697097550000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_workspace_003",
+      "parentId": "fld_queries",
+      "modified": 1697097600000,
+      "created": 1697097600000,
+      "url": "{{ _.base_url }}",
+      "name": "Get Complete Workspace Hierarchy",
+      "description": "Full nested query for complete data",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/graphql",
+        "text": "query GetCompleteWorkspaceHierarchy($workplaceId: String!) {\n  workplace(id: $workplaceId) {\n    id\n    name\n    created\n    updated\n    appData {\n      id\n      title\n      metadata {\n        created\n        updated\n      }\n      blocks {\n        id\n        head\n        metadata {\n          created\n          updated\n        }\n        notes {\n          id\n          priority\n          head\n          note\n          metadata {\n            created\n            updated\n            completed\n          }\n        }\n      }\n    }\n  }\n}",
+        "variables": "{\n  \"workplaceId\": \"workspace-1\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1697097540000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_mut_workspace_001",
+      "parentId": "fld_mutations_workplace",
+      "modified": 1697097600000,
+      "created": 1697097600000,
+      "url": "{{ _.base_url }}",
+      "name": "Create Workplace",
+      "description": "Create a new workplace",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/graphql",
+        "text": "mutation CreateWorkplace($id: String!, $name: String) {\n  createWorkplace(input: {\n    id: $id\n    name: $name\n  }) {\n    id\n    name\n    created\n    updated\n  }\n}",
+        "variables": "{\n  \"id\": \"workspace-1\",\n  \"name\": \"My First Workspace\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1697097600000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_mut_workspace_002",
+      "parentId": "fld_mutations_workplace",
+      "modified": 1697097600000,
+      "created": 1697097600000,
+      "url": "{{ _.base_url }}",
+      "name": "Update Workplace",
+      "description": "Update an existing workplace",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/graphql",
+        "text": "mutation UpdateWorkplace($id: String!, $name: String) {\n  updateWorkplace(\n    id: $id\n    input: {\n      name: $name\n    }\n  ) {\n    id\n    name\n    updated\n  }\n}",
+        "variables": "{\n  \"id\": \"workspace-1\",\n  \"name\": \"Updated Workspace Name\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1697097590000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_mut_workspace_003",
+      "parentId": "fld_mutations_workplace",
+      "modified": 1697097600000,
+      "created": 1697097600000,
+      "url": "{{ _.base_url }}",
+      "name": "Delete Workplace",
+      "description": "Delete a workplace",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/graphql",
+        "text": "mutation DeleteWorkplace($id: String!) {\n  deleteWorkplace(id: $id)\n}",
+        "variables": "{\n  \"id\": \"workspace-1\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1697097580000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_mut_appdata_001",
+      "parentId": "fld_mutations_appdata",
+      "modified": 1697097600000,
+      "created": 1697097600000,
+      "url": "{{ _.base_url }}",
+      "name": "Create App Data",
+      "description": "Create new app data",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/graphql",
+        "text": "mutation CreateAppData($workplaceId: String!, $title: String) {\n  createAppData(input: {\n    workplaceId: $workplaceId\n    title: $title\n  }) {\n    id\n    workplaceId\n    title\n    metadata {\n      created\n      updated\n    }\n  }\n}",
+        "variables": "{\n  \"workplaceId\": \"workspace-1\",\n  \"title\": \"My Todo App\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1697097600000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_mut_appdata_002",
+      "parentId": "fld_mutations_appdata",
+      "modified": 1697097600000,
+      "created": 1697097600000,
+      "url": "{{ _.base_url }}",
+      "name": "Update App Data",
+      "description": "Update existing app data",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/graphql",
+        "text": "mutation UpdateAppData($id: Int!, $title: String) {\n  updateAppData(\n    id: $id\n    input: {\n      title: $title\n    }\n  ) {\n    id\n    title\n    metadata {\n      updated\n    }\n  }\n}",
+        "variables": "{\n  \"id\": 1,\n  \"title\": \"Updated Todo App\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1697097590000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_mut_appdata_003",
+      "parentId": "fld_mutations_appdata",
+      "modified": 1697097600000,
+      "created": 1697097600000,
+      "url": "{{ _.base_url }}",
+      "name": "Delete App Data",
+      "description": "Delete app data",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/graphql",
+        "text": "mutation DeleteAppData($id: Int!) {\n  deleteAppData(id: $id)\n}",
+        "variables": "{\n  \"id\": 1\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1697097580000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_mut_noteblock_001",
+      "parentId": "fld_mutations_noteblock",
+      "modified": 1697097600000,
+      "created": 1697097600000,
+      "url": "{{ _.base_url }}",
+      "name": "Create Note Block",
+      "description": "Create a new note block",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/graphql",
+        "text": "mutation CreateNoteBlock($appId: Int!, $head: String!) {\n  createNoteBlock(input: {\n    appId: $appId\n    head: $head\n  }) {\n    id\n    appId\n    head\n    metadata {\n      created\n      updated\n    }\n  }\n}",
+        "variables": "{\n  \"appId\": 1,\n  \"head\": \"Work Tasks\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1697097600000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_mut_noteblock_002",
+      "parentId": "fld_mutations_noteblock",
+      "modified": 1697097600000,
+      "created": 1697097600000,
+      "url": "{{ _.base_url }}",
+      "name": "Update Note Block",
+      "description": "Update an existing note block",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/graphql",
+        "text": "mutation UpdateNoteBlock($id: Int!, $head: String) {\n  updateNoteBlock(\n    id: $id\n    input: {\n      head: $head\n    }\n  ) {\n    id\n    head\n    metadata {\n      updated\n    }\n  }\n}",
+        "variables": "{\n  \"id\": 1,\n  \"head\": \"Updated Work Tasks\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1697097590000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_mut_noteblock_003",
+      "parentId": "fld_mutations_noteblock",
+      "modified": 1697097600000,
+      "created": 1697097600000,
+      "url": "{{ _.base_url }}",
+      "name": "Delete Note Block",
+      "description": "Delete a note block",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/graphql",
+        "text": "mutation DeleteNoteBlock($id: Int!) {\n  deleteNoteBlock(id: $id)\n}",
+        "variables": "{\n  \"id\": 1\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1697097580000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_mut_note_001",
+      "parentId": "fld_mutations_note",
+      "modified": 1697097600000,
+      "created": 1697097600000,
+      "url": "{{ _.base_url }}",
+      "name": "Create Note",
+      "description": "Create a new note",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/graphql",
+        "text": "mutation CreateNote($blockId: Int!, $priority: String, $head: String, $note: String) {\n  createNote(input: {\n    blockId: $blockId\n    priority: $priority\n    head: $head\n    note: $note\n  }) {\n    id\n    blockId\n    priority\n    head\n    note\n    metadata {\n      created\n      updated\n      completed\n    }\n  }\n}",
+        "variables": "{\n  \"blockId\": 1,\n  \"priority\": \"high\",\n  \"head\": \"Complete project documentation\",\n  \"note\": \"Write comprehensive docs for the API endpoints\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1697097600000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_mut_note_002",
+      "parentId": "fld_mutations_note",
+      "modified": 1697097600000,
+      "created": 1697097600000,
+      "url": "{{ _.base_url }}",
+      "name": "Update Note",
+      "description": "Update an existing note",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/graphql",
+        "text": "mutation UpdateNote($id: Int!, $priority: String, $head: String, $note: String, $completed: Boolean) {\n  updateNote(\n    id: $id\n    input: {\n      priority: $priority\n      head: $head\n      note: $note\n      completed: $completed\n    }\n  ) {\n    id\n    priority\n    head\n    note\n    metadata {\n      updated\n      completed\n    }\n  }\n}",
+        "variables": "{\n  \"id\": 1,\n  \"priority\": \"medium\",\n  \"head\": \"Updated task title\",\n  \"note\": \"Updated task description\",\n  \"completed\": true\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1697097590000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_mut_note_003",
+      "parentId": "fld_mutations_note",
+      "modified": 1697097600000,
+      "created": 1697097600000,
+      "url": "{{ _.base_url }}",
+      "name": "Delete Note",
+      "description": "Delete a note",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/graphql",
+        "text": "mutation DeleteNote($id: Int!) {\n  deleteNote(id: $id)\n}",
+        "variables": "{\n  \"id\": 1\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1697097580000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_mut_import_001",
+      "parentId": "fld_mutations_import",
+      "modified": 1697097600000,
+      "created": 1697097600000,
+      "url": "{{ _.base_url }}",
+      "name": "Import Workspaces",
+      "description": "Bulk import workspaces with complete data",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/graphql",
+        "text": "mutation ImportWorkspaces($input: ImportInput!) {\n  importWorkspaces(input: $input) {\n    id\n    name\n    created\n    updated\n    appData {\n      id\n      title\n      blocks {\n        id\n        head\n        notes {\n          id\n          priority\n          head\n          note\n          metadata {\n            completed\n          }\n        }\n      }\n    }\n  }\n}",
+        "variables": "{\n  \"input\": {\n    \"exportDate\": \"2025-10-12T10:00:00Z\",\n    \"version\": \"1.0\",\n    \"workspaces\": [\n      {\n        \"id\": \"workspace-import-1\",\n        \"name\": \"Imported Workspace\",\n        \"created\": \"2025-10-01T10:00:00Z\",\n        \"lastModified\": \"2025-10-12T10:00:00Z\",\n        \"data\": {\n          \"appConfig\": {\n            \"title\": \"Imported App\",\n            \"metadata\": {\n              \"created\": \"2025-10-01T10:00:00Z\",\n              \"updated\": \"2025-10-12T10:00:00Z\"\n            }\n          },\n          \"noteBlocks\": [\n            {\n              \"id\": \"1\",\n              \"head\": \"Imported Block 1\",\n              \"metadata\": {\n                \"created\": \"2025-10-01T10:00:00Z\",\n                \"updated\": \"2025-10-12T10:00:00Z\"\n              },\n              \"notes\": [\n                {\n                  \"id\": \"1\",\n                  \"priority\": \"high\",\n                  \"head\": \"Imported Note 1\",\n                  \"note\": \"This is an imported note\",\n                  \"metadata\": {\n                    \"created\": \"2025-10-01T10:00:00Z\",\n                    \"updated\": \"2025-10-12T10:00:00Z\",\n                    \"completed\": false\n                  }\n                },\n                {\n                  \"id\": \"2\",\n                  \"priority\": \"medium\",\n                  \"head\": \"Imported Note 2\",\n                  \"note\": \"Another imported note\",\n                  \"metadata\": {\n                    \"created\": \"2025-10-02T10:00:00Z\",\n                    \"updated\": \"2025-10-12T10:00:00Z\",\n                    \"completed\": true\n                  }\n                }\n              ]\n            },\n            {\n              \"id\": \"2\",\n              \"head\": \"Imported Block 2\",\n              \"metadata\": {\n                \"created\": \"2025-10-05T10:00:00Z\",\n                \"updated\": \"2025-10-12T10:00:00Z\"\n              },\n              \"notes\": [\n                {\n                  \"id\": \"3\",\n                  \"priority\": \"low\",\n                  \"head\": \"Imported Note 3\",\n                  \"note\": \"Third imported note\",\n                  \"metadata\": {\n                    \"created\": \"2025-10-05T10:00:00Z\",\n                    \"updated\": \"2025-10-12T10:00:00Z\",\n                    \"completed\": false\n                  }\n                }\n              ]\n            }\n          ]\n        }\n      }\n    ]\n  }\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1697097600000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    }
+  ]
+}

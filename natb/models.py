@@ -22,8 +22,8 @@ class Note(Base):
         "metadata",
         JSON,
         default=lambda: {
-            "created": datetime.now(),
-            "updated": datetime.now(),
+            "created": datetime.now().isoformat(),
+            "updated": datetime.now().isoformat(),
             "completed": False,
         },
     )
@@ -40,8 +40,8 @@ class NoteBlock(Base):
         "metadata",
         JSON,
         default=lambda: {
-            "created": datetime.now(),
-            "updated": datetime.now(),
+            "created": datetime.now().isoformat(),
+            "updated": datetime.now().isoformat(),
         },
     )
     notes: Mapped[List["Note"]] = relationship(back_populates="block")
@@ -58,8 +58,8 @@ class AppData(Base):
         "metadata",
         JSON,
         default=lambda: {
-            "created": datetime.now(),
-            "updated": datetime.now(),
+            "created": datetime.now().isoformat(),
+            "updated": datetime.now().isoformat(),
         },
     )
     blocks: Mapped[List["NoteBlock"]] = relationship(back_populates="app_data")
