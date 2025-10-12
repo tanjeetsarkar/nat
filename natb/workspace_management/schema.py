@@ -47,7 +47,7 @@ class NoteType:
 @strawberry.type
 class NoteBlockType:
     id: strawberry.ID
-    app_id: int
+    app_id: strawberry.ID
     head: str
     # metadata: MetadataType
 
@@ -76,7 +76,7 @@ class NoteBlockType:
 
 @strawberry.type
 class AppDataType:
-    id: int
+    id: strawberry.ID
     workplace_id: str
     title: Optional[str]
     # metadata: MetadataType
