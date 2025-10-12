@@ -20,7 +20,7 @@ engine = create_engine(DATABASE_URL)
 
 async_engine = create_async_engine(
     ASYNC_DATABASE_URL,
-    echo=True,  # Set to False in production
+    echo=False,  # Set to False in production
     future=True,
     connect_args={"check_same_thread": False}
 )

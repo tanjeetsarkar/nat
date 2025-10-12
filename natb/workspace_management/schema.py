@@ -84,8 +84,6 @@ class AppDataType:
     @strawberry.field
     def metadata(self) -> MetadataType:
         m = getattr(self, "metadata_col", {})
-        print("appdata metadata", m)
-
         return MetadataType(
             created=datetime.fromisoformat(m.get("created")),
             updated=datetime.fromisoformat(m.get("updated")),
@@ -336,7 +334,10 @@ class Mutation:
         app_data = AppData(
             workplace_id=input.workplace_id,
             title=input.title,
-            metadata_col={"created": datetime.now().isoformat(), "updated": datetime.now().isoformat()},
+            metadata_col={
+                "created": datetime.now().isoformat(),
+                "updated": datetime.now().isoformat(),
+            },
         )
         session.add(app_data)
         await session.commit()
@@ -387,7 +388,10 @@ class Mutation:
         note_block = NoteBlock(
             app_id=input.app_id,
             head=input.head,
-            metadata_col={"created": datetime.now().isoformat(), "updated": datetime.now().isoformat()},
+            metadata_col={
+                "created": datetime.now().isoformat(),
+                "updated": datetime.now().isoformat(),
+            },
         )
         session.add(note_block)
         await session.commit()
