@@ -73,4 +73,4 @@ class WorkPlace(Base):
     name: Mapped[Optional[str]]
     created: Mapped[datetime] = mapped_column(default=datetime.now())
     updated: Mapped[datetime] = mapped_column(default=datetime.now())
-    app_data: Mapped["AppData"] = relationship(back_populates="workplace")
+    app_data: Mapped["AppData"] = relationship(back_populates="workplace", uselist=False)

@@ -2,7 +2,6 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 
 export const SortableNotes = ({ note, dataManager, block, editNote }) => {
-
     const {
         attributes,
         listeners,
@@ -18,8 +17,6 @@ export const SortableNotes = ({ note, dataManager, block, editNote }) => {
         opacity: isDragging ? 0.5 : 1
     };
 
-
-
     const getPriorityBorder = (priority) => {
         switch (priority) {
             case 'high': return '#e57373';
@@ -28,7 +25,6 @@ export const SortableNotes = ({ note, dataManager, block, editNote }) => {
             default: return '#ccc';
         }
     };
-
 
     const getPriorityColor = (priority) => {
         switch (priority) {
@@ -39,10 +35,33 @@ export const SortableNotes = ({ note, dataManager, block, editNote }) => {
         }
     };
 
+    const handleCheckboxChange = async (e) => {
+        e.stopPropagation();
+        try {
+            await dataManager.updateNote(block.id, note.id, {
+                priority: note.priority,
+                head: note.head,
+                note: note.note,
+                completed: e.target.checked
+            });
+        } catch (error) {
+            console.error('Error updating note completion:', error);
+        }
+    };
 
+    const handleDelete = async (e) => {
+        e.stopPropagation();
+        if (window.confirm('Are you sure you want to delete this note?')) {
+            try {
+                await dataManager.deleteNote(block.id, note.id);
+            } catch (error) {
+                console.error('Error deleting note:', error);
+            }
+        }
+    };
 
     return (
-        <div key={note.id}
+        <div
             ref={setNodeRef}
             style={{
                 ...style,
@@ -52,7 +71,6 @@ export const SortableNotes = ({ note, dataManager, block, editNote }) => {
                 backgroundColor: note.metadata.completed ? '#f0f8f0' : getPriorityColor(note.priority),
                 cursor: 'pointer',
                 boxShadow: isDragging ? '0 4px 12px rgba(0,0,0,0.15)' : '0 2px 4px rgba(0,0,0,0.1)',
-
             }}
             onClick={() => editNote(note)}
         >
@@ -63,19 +81,17 @@ export const SortableNotes = ({ note, dataManager, block, editNote }) => {
                 style={{
                     cursor: 'grab',
                     touchAction: 'none',
+                }}
+            >
+                <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    marginBottom: '8px'
                 }}>
-                <div
-                    style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        marginBottom: '8px'
-                    }}
-
-                >
                     <input
                         type="checkbox"
-                        checked={note.metadata.completed}
-                        onChange={(e) => dataManager.updateNote(block.id, note.id, { completed: e.target.checked })}
+                        checked={note.metadata.completed || false}
+                        onChange={handleCheckboxChange}
                         style={{ marginRight: '8px' }}
                         onClick={(e) => e.stopPropagation()}
                     />
@@ -98,10 +114,7 @@ export const SortableNotes = ({ note, dataManager, block, editNote }) => {
                         </div>
                     </div>
                     <button
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            dataManager.deleteNote(block.id, note.id);
-                        }}
+                        onClick={handleDelete}
                         style={{
                             padding: '2px 6px',
                             border: '1px solid #666',
@@ -136,7 +149,6 @@ export const SortableNotes = ({ note, dataManager, block, editNote }) => {
                     )}
                 </div>
             </div>
-
         </div>
-    )
-}
+    );
+};

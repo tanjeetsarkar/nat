@@ -3,20 +3,38 @@ import { useState } from "react";
 export function WorkspaceTabs({ workspaceManager }) {
   const [isCreating, setIsCreating] = useState(false);
   const [newWorkspaceName, setNewWorkspaceName] = useState('');
-
-  const handleCreateWorkspace = () => {
+  console.log("workspaceManager.workspaces.", workspaceManager.workspaces)
+  const handleCreateWorkspace = async () => {
     if (newWorkspaceName.trim()) {
-      workspaceManager.createWorkspace(newWorkspaceName.trim());
-      setNewWorkspaceName('');
-      setIsCreating(false);
+      try {
+        await workspaceManager.createWorkspace(newWorkspaceName.trim());
+        setNewWorkspaceName('');
+        setIsCreating(false);
+      } catch (error) {
+        console.error('Error creating workspace:', error);
+        alert('Failed to create workspace. Please try again.');
+      }
     }
   };
 
-  const handleDeleteWorkspace = (workspaceId, workspaceName) => {
+  const handleDeleteWorkspace = async (workspaceId, workspaceName) => {
     if (window.confirm(`Are you sure you want to delete "${workspaceName}"? This cannot be undone.`)) {
-      workspaceManager.deleteWorkspace(workspaceId);
+      try {
+        await workspaceManager.deleteWorkspace(workspaceId);
+      } catch (error) {
+        console.error('Error deleting workspace:', error);
+        alert('Failed to delete workspace. Please try again.');
+      }
     }
   };
+
+  if (workspaceManager.loading) {
+    return <div style={{ padding: '10px' }}>Loading workspaces...</div>;
+  }
+
+  if (workspaceManager.error) {
+    return <div style={{ padding: '10px', color: 'red' }}>Error loading workspaces</div>;
+  }
 
   return (
     <div style={{
@@ -135,8 +153,8 @@ export function WorkspaceTabs({ workspaceManager }) {
       </div>
       
       <div style={{ fontSize: '11px', color: '#666' }}>
-        {workspaceManager.workspaces.list.find(ws => ws.id === workspaceManager.workspaces.active)?.lastModified && (
-          <>Last modified: {new Date(workspaceManager.workspaces.list.find(ws => ws.id === workspaceManager.workspaces.active).lastModified).toLocaleString()}</>
+        {workspaceManager.workspaces.list.find(ws => ws.id === workspaceManager.workspaces.active)?.updated && (
+          <>Last modified: {new Date(workspaceManager.workspaces.list.find(ws => ws.id === workspaceManager.workspaces.active).updated).toLocaleString()}</>
         )}
       </div>
     </div>

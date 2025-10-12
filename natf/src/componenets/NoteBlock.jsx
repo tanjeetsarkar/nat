@@ -3,6 +3,15 @@ import { Note } from './Note';
 
 export default function TodoApp({ workspaceId, workspaceManager }) {
   const dataManager = useNoteData(workspaceId);
+  
+  if (dataManager.loading) {
+    return <div style={{ padding: '20px', textAlign: 'center' }}>Loading...</div>;
+  }
+
+  if (dataManager.error) {
+    console.error("Got error in data manager", dataManager.error);
+    return <div style={{ padding: '20px', color: 'red' }}>Error loading data: {dataManager.error.message}</div>;
+  }
 
   const exportToText = () => {
     let text = `${dataManager.appConfig.title.toUpperCase()} - EXPORT\n`;
@@ -73,18 +82,18 @@ export default function TodoApp({ workspaceId, workspaceManager }) {
     URL.revokeObjectURL(url);
   };
 
-  const importToCurrentWorkspace = () => {
+  const importToCurrentWorkspace = async () => {
     const fileInput = document.createElement('input');
     fileInput.type = 'file';
     fileInput.accept = '.json';
     fileInput.style.display = 'none';
 
-    fileInput.onchange = (event) => {
+    fileInput.onchange = async (event) => {
       const file = event.target.files[0];
       if (!file) return;
 
       const reader = new FileReader();
-      reader.onload = (e) => {
+      reader.onload = async (e) => {
         try {
           const importedData = JSON.parse(e.target.result);
 
@@ -96,9 +105,10 @@ export default function TodoApp({ workspaceId, workspaceManager }) {
             );
 
             if (confirmImport) {
-              const success = workspaceManager.importAllWorkspaces(importedData);
+              const success = await workspaceManager.importAllWorkspaces(importedData);
               if (success) {
                 alert('All workspaces imported successfully!');
+                await dataManager.refetch();
               } else {
                 alert('Failed to import workspaces. Please check the file format.');
               }
@@ -110,11 +120,12 @@ export default function TodoApp({ workspaceId, workspaceManager }) {
             );
 
             if (confirmImport) {
-              const success = dataManager.importData(importedData);
+              const success = await dataManager.importData(importedData);
               if (success) {
                 alert('Workspace imported successfully!');
                 // Update workspace last modified time
-                workspaceManager.updateWorkspace(workspaceId, {});
+                await workspaceManager.updateWorkspace(workspaceId, {});
+                await dataManager.refetch();
               } else {
                 alert('Failed to import data. Please check the file format.');
               }
@@ -160,7 +171,7 @@ export default function TodoApp({ workspaceId, workspaceManager }) {
             borderRadius: '4px'
           }}
         />
-        {dataManager.appConfig.metadata.updated !== dataManager.appConfig.metadata.created && (
+        {dataManager.appConfig.metadata?.updated !== dataManager.appConfig.metadata?.created && (
           <div style={{ fontSize: '12px', color: '#888', marginBottom: '15px' }}>
             Title last updated: {new Date(dataManager.appConfig.metadata.updated).toLocaleString()}
           </div>
