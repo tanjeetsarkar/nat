@@ -150,7 +150,7 @@ class UpdateAppDataInput:
 
 @strawberry.input
 class CreateNoteBlockInput:
-    app_id: int
+    app_id: strawberry.ID
     head: str
 
 
@@ -161,7 +161,7 @@ class UpdateNoteBlockInput:
 
 @strawberry.input
 class CreateNoteInput:
-    block_id: int
+    block_id: strawberry.ID
     priority: Optional[str] = "medium"
     head: Optional[str] = None
     note: Optional[str] = None
@@ -346,7 +346,7 @@ class Mutation:
 
     @strawberry.mutation
     async def update_app_data(
-        self, info, id: int, input: UpdateAppDataInput
+        self, info, id: strawberry.ID, input: UpdateAppDataInput
     ) -> Optional[AppDataType]:
         """Update existing app data"""
         session: AsyncSession = info.context["session"]
@@ -365,7 +365,7 @@ class Mutation:
         return app_data
 
     @strawberry.mutation
-    async def delete_app_data(self, info, id: int) -> bool:
+    async def delete_app_data(self, info, id: strawberry.ID) -> bool:
         """Delete app data"""
         session: AsyncSession = info.context["session"]
         result = await session.execute(select(AppData).where(AppData.id == id))
