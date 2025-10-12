@@ -27,7 +27,7 @@ class Note(Base):
             "completed": False,
         },
     )
-    block: Mapped["NoteBlock"] = relationship(back_populates="note")
+    block: Mapped["NoteBlock"] = relationship(back_populates="notes")
 
 
 class NoteBlock(Base):
@@ -45,14 +45,14 @@ class NoteBlock(Base):
         },
     )
     notes: Mapped[List["Note"]] = relationship(back_populates="block")
-    app_data: Mapped["AppData"] = relationship(back_populates="app")
+    app_data: Mapped["AppData"] = relationship(back_populates="blocks")
 
 
 class AppData(Base):
     __tablename__ = "tbl_app_data"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    worplace_id: Mapped[str] = mapped_column(ForeignKey("tbl_workplace.id"))
+    workplace_id: Mapped[str] = mapped_column(ForeignKey("tbl_workplace.id"))
     title: Mapped[Optional[str]]
     metadata_col: Mapped[Dict[str, Any]] = mapped_column(
         "metadata",
@@ -62,7 +62,7 @@ class AppData(Base):
             "updated": datetime.now(),
         },
     )
-    blocks: Mapped[List["NoteBlock"]] = relationship(back_populates="app")
+    blocks: Mapped[List["NoteBlock"]] = relationship(back_populates="app_data")
     workplace: Mapped["WorkPlace"] = relationship(back_populates="app_data")
 
 
