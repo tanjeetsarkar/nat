@@ -1,4 +1,3 @@
-// src/components/TrelloBoard.jsx
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation } from '@apollo/client/react';
 import { 
@@ -150,6 +149,8 @@ function TrelloBoard() {
     }
   };
 
+  const [draggedItem, setDraggedItem] = useState(null);
+
   const handleDragStart = (event) => {
     const { active } = event;
     setActiveId(active.id);
@@ -157,8 +158,19 @@ function TrelloBoard() {
     // Determine if dragging a block or note
     if (active.id.toString().startsWith('block-')) {
       setActiveType('block');
+      const blockId = active.id.toString().replace('block-', '');
+      const block = appData?.blocks?.find(b => b.id === blockId);
+      setDraggedItem(block);
     } else if (active.id.toString().startsWith('note-')) {
       setActiveType('note');
+      const noteId = active.id.toString().replace('note-', '');
+      // Find the note across all blocks
+      let foundNote = null;
+      appData?.blocks?.forEach(block => {
+        const note = block.notes?.find(n => n.id === noteId);
+        if (note) foundNote = note;
+      });
+      setDraggedItem(foundNote);
     }
   };
 
@@ -247,6 +259,72 @@ function TrelloBoard() {
 
     setActiveId(null);
     setActiveType(null);
+    setDraggedItem(null);
+  };
+
+  const getCardStyle = (priority, completed) => {
+    if (completed) {
+      return {
+        backgroundColor: '#d4edda',
+        borderColor: '#28a745',
+      };
+    }
+    
+    switch (priority) {
+      case 'high':
+        return {
+          backgroundColor: '#ffe0e0',
+          borderColor: '#ff4444',
+        };
+      case 'medium':
+        return {
+          backgroundColor: '#fff8dc',
+          borderColor: '#ffcc00',
+        };
+      case 'low':
+        return {
+          backgroundColor: '#ffffff',
+          borderColor: '#ddd',
+        };
+      default:
+        return {
+          backgroundColor: '#ffffff',
+          borderColor: '#ddd',
+        };
+    }
+  };
+
+  const getPriorityBadgeStyle = (priority, completed) => {
+    if (completed) {
+      return {
+        backgroundColor: '#28a745',
+        color: '#fff',
+      };
+    }
+    
+    switch (priority) {
+      case 'high':
+        return {
+          backgroundColor: '#ff4444',
+          color: '#fff',
+        };
+      case 'medium':
+        return {
+          backgroundColor: '#ffcc00',
+          color: '#000',
+        };
+      case 'low':
+        return {
+          backgroundColor: '#fff',
+          color: '#666',
+          border: '1px solid #ddd',
+        };
+      default:
+        return {
+          backgroundColor: '#ddd',
+          color: '#666',
+        };
+    }
   };
 
   const appData = workplaceData?.workplace?.appData?.[0];
@@ -374,14 +452,40 @@ function TrelloBoard() {
           </div>
 
           <DragOverlay>
-            {activeId && activeType === 'block' && (
-              <div style={styles.dragOverlay}>
-                Dragging Block...
+            {activeId && activeType === 'block' && draggedItem && (
+              <div style={styles.blockOverlay}>
+                <div style={styles.blockOverlayHeader}>⋮⋮</div>
+                <h3 style={styles.blockOverlayTitle}>{draggedItem.head}</h3>
+                <div style={styles.blockOverlayCount}>
+                  {draggedItem.notes?.length || 0} cards
+                </div>
               </div>
             )}
-            {activeId && activeType === 'note' && (
-              <div style={styles.dragOverlay}>
-                Dragging Note...
+            {activeId && activeType === 'note' && draggedItem && (
+              <div style={{
+                ...styles.noteOverlay,
+                ...getCardStyle(draggedItem.priority, draggedItem.metadata?.completed),
+              }}>
+                <div style={styles.noteOverlayTop}>
+                  <span style={{
+                    ...styles.noteOverlayPriority,
+                    ...getPriorityBadgeStyle(draggedItem.priority, draggedItem.metadata?.completed),
+                  }}>
+                    {draggedItem.metadata?.completed ? 'Done' : draggedItem.priority}
+                  </span>
+                </div>
+                {draggedItem.head && (
+                  <div style={styles.noteOverlayHead}>
+                    {draggedItem.head}
+                  </div>
+                )}
+                {draggedItem.note && (
+                  <div style={styles.noteOverlayText}>
+                    {draggedItem.note.length > 60 
+                      ? draggedItem.note.substring(0, 60) + '...' 
+                      : draggedItem.note}
+                  </div>
+                )}
               </div>
             )}
           </DragOverlay>
@@ -553,13 +657,63 @@ const styles = {
     fontSize: '18px',
     color: '#666',
   },
-  dragOverlay: {
-    padding: '20px',
-    backgroundColor: '#fff',
+  blockOverlay: {
+    width: '280px',
+    backgroundColor: '#f5f5f5',
     border: '2px solid #000',
+    borderRadius: '8px',
+    padding: '12px',
+    boxShadow: '0 8px 24px rgba(0, 0, 0, 0.3)',
+    opacity: 0.8,
+    transform: 'rotate(-3deg)',
+    animation: 'pulse 1s ease-in-out infinite',
+  },
+  blockOverlayHeader: {
+    fontSize: '16px',
+    color: '#999',
+    marginBottom: '8px',
+  },
+  blockOverlayTitle: {
+    fontSize: '16px',
+    fontWeight: '600',
+    margin: '0 0 8px 0',
+  },
+  blockOverlayCount: {
+    fontSize: '12px',
+    color: '#666',
+  },
+  noteOverlay: {
+    width: '250px',
+    border: '2px solid',
+    borderRadius: '6px',
+    padding: '12px',
+    boxShadow: '0 8px 24px rgba(0, 0, 0, 0.3)',
+    opacity: 0.85,
+    transform: 'rotate(-2deg)',
+    cursor: 'grabbing',
+  },
+  noteOverlayTop: {
+    display: 'flex',
+    alignItems: 'center',
+    marginBottom: '8px',
+  },
+  noteOverlayPriority: {
+    fontSize: '10px',
+    padding: '3px 8px',
     borderRadius: '4px',
+    textTransform: 'uppercase',
+    fontWeight: '600',
+  },
+  noteOverlayHead: {
     fontSize: '14px',
     fontWeight: '600',
+    marginBottom: '6px',
+    wordBreak: 'break-word',
+  },
+  noteOverlayText: {
+    fontSize: '12px',
+    color: '#555',
+    wordBreak: 'break-word',
   },
 };
 

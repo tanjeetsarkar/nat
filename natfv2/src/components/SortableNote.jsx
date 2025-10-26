@@ -234,7 +234,7 @@ const styles = {
     transform: 'translateY(-50%)',
     cursor: 'grab',
     fontSize: '12px',
-    color: '#ccc',
+    color: '#3f3f3fff',
     userSelect: 'none',
     padding: '4px',
     zIndex: 10,
