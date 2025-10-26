@@ -197,6 +197,7 @@ class ImportNoteInput:
     head: Optional[str]
     note: Optional[str]
     metadata: ImportMetadataInput
+    order: Optional[int]
 
 
 @strawberry.input
@@ -205,18 +206,15 @@ class ImportNoteBlockInput:
     head: str
     metadata: ImportMetadataInput
     notes: List[ImportNoteInput]
-
-
-@strawberry.input
-class ImportAppConfigInput:
-    title: str
-    metadata: ImportMetadataInput
+    order: Optional[int]
 
 
 @strawberry.input
 class ImportDataInput:
-    note_blocks: List[ImportNoteBlockInput] = strawberry.field(name="noteBlocks")
-    app_config: ImportAppConfigInput = strawberry.field(name="appConfig")
+    blocks: List[ImportNoteBlockInput]
+    id: str
+    title: str
+    metadata: ImportMetadataInput
 
 
 @strawberry.input
@@ -224,8 +222,8 @@ class ImportWorkspaceInput:
     id: str
     name: str
     created: str
-    last_modified: str = strawberry.field(name="lastModified")
-    data: ImportDataInput
+    updated: str
+    app_data: List[ImportDataInput]
 
 
 @strawberry.input
@@ -292,7 +290,10 @@ class Mutation:
         """Create a new workplace"""
         session: AsyncSession = info.context["session"]
         workplace = WorkPlace(
-            id=input.id, name=input.name, created=datetime.now(), updated=datetime.now()
+            id=input.id,
+            name=input.name,
+            created=datetime.now().isoformat(),
+            updated=datetime.now().isoformat(),
         )
         session.add(workplace)
         await session.commit()
@@ -313,7 +314,7 @@ class Mutation:
 
         if input.name is not None:
             workplace.name = input.name
-        workplace.updated = datetime.now()
+        workplace.updated = datetime.now().isoformat()
 
         await session.commit()
         await session.refresh(workplace)
@@ -365,7 +366,7 @@ class Mutation:
 
         if input.title is not None:
             app_data.title = input.title
-        app_data.metadata_col["updated"] = datetime.now()
+        app_data.metadata_col["updated"] = datetime.now().isoformat()
 
         await session.commit()
         await session.refresh(app_data)
@@ -429,7 +430,7 @@ class Mutation:
             note_block.head = input.head
         if input.order is not None:
             note_block.order = input.order
-        note_block.metadata_col["updated"] = datetime.now()
+        note_block.metadata_col["updated"] = datetime.now().isoformat()
 
         await session.commit()
         await session.refresh(note_block)
@@ -494,8 +495,8 @@ class Mutation:
         if input.order is not None:
             note.order = input.order
 
-        note.metadata_col["updated"] = datetime.now()
-
+        note.metadata_col["updated"] = datetime.now().isoformat()
+        
         await session.commit()
         await session.refresh(note)
         return note
@@ -533,7 +534,7 @@ class Mutation:
                 workplace = existing_workplace
                 workplace.name = workspace_input.name
                 workplace.updated = datetime.fromisoformat(
-                    workspace_input.last_modified.replace("Z", "+00:00")
+                    workspace_input.updated.replace("Z", "+00:00")
                 )
             else:
                 # Create new workplace
@@ -544,7 +545,7 @@ class Mutation:
                         workspace_input.created.replace("Z", "+00:00")
                     ),
                     updated=datetime.fromisoformat(
-                        workspace_input.last_modified.replace("Z", "+00:00")
+                        workspace_input.updated.replace("Z", "+00:00")
                     ),
                 )
                 session.add(workplace)
@@ -560,18 +561,18 @@ class Mutation:
 
             if existing_app_data:
                 app_data = existing_app_data
-                app_data.title = workspace_input.data.app_config.title
+                app_data.title = workspace_input.app_data[0].title
                 app_data.metadata_col = {
-                    "created": workspace_input.data.app_config.metadata.created,
-                    "updated": workspace_input.data.app_config.metadata.updated,
+                    "created": workspace_input.app_data[0].metadata.created,
+                    "updated": workspace_input.app_data[0].metadata.updated,
                 }
             else:
                 app_data = AppData(
                     workplace_id=workplace.id,
-                    title=workspace_input.data.app_config.title,
+                    title=workspace_input.app_data[0].title,
                     metadata_col={
-                        "created": workspace_input.data.app_config.metadata.created,
-                        "updated": workspace_input.data.app_config.metadata.updated,
+                        "created": workspace_input.app_data[0].metadata.created,
+                        "updated": workspace_input.app_data[0].metadata.updated,
                     },
                 )
                 session.add(app_data)
@@ -579,7 +580,7 @@ class Mutation:
             await session.flush()
 
             # Process NoteBlocks
-            for block_input in workspace_input.data.note_blocks:
+            for block_input in workspace_input.app_data[0].blocks:
                 # Check if note block exists
                 result = await session.execute(
                     select(NoteBlock).where(
@@ -599,7 +600,7 @@ class Mutation:
                 else:
                     note_block = NoteBlock(
                         id=int(block_input.id),
-                        app_id=app_data.id,
+                        app_id=app_data[0].id,
                         head=block_input.head,
                         metadata_col={
                             "created": block_input.metadata.created,

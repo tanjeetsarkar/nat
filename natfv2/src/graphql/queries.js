@@ -5,12 +5,42 @@ import { gql } from '@apollo/client';
 export const GET_WORKPLACES = gql`
   query GetWorkplaces {
     workplaces {
+    id
+    name
+    created
+    updated
+    appData {
       id
-      name
-      created
-      updated
+      title
+      metadata {
+        created
+        updated
+      }
+      blocks {
+        id
+        head
+        order
+        metadata {
+          created
+          updated
+          completed
+        }
+        notes {
+          id
+          priority
+          note
+          head
+          order
+          metadata {
+            created
+            updated
+            completed
+          }
+        }
+      }
     }
   }
+}
 `;
 
 export const GET_WORKPLACE = gql`

@@ -5,8 +5,25 @@ import { IMPORT_WORKSPACES, GET_WORKPLACES } from '../graphql/queries';
 
 function ImportExport({ onImportComplete }) {
   const fileInputRef = useRef(null);
-  const { data } = useQuery(GET_WORKPLACES);
+  const { data } = useQuery(GET_WORKPLACES,);
   const [importWorkspaces] = useMutation(IMPORT_WORKSPACES);
+
+  const removeTypename = (value) => {
+    if (value === null || value === undefined) {
+      return value;
+    } else if (Array.isArray(value)) {
+      return value.map(v => removeTypename(v));
+    } else if (typeof value === 'object') {
+      const newObj = {};
+      Object.entries(value).forEach(([key, v]) => {
+        if (key !== '__typename') {
+          newObj[key] = removeTypename(v);
+        }
+      });
+      return newObj;
+    }
+    return value;
+  };
 
   const handleExport = () => {
     if (!data?.workplaces || data.workplaces.length === 0) {
@@ -14,31 +31,18 @@ function ImportExport({ onImportComplete }) {
       return;
     }
 
+
+
     // Create export data structure
     const exportData = {
       exportDate: new Date().toISOString(),
       version: "1.0",
-      workspaces: data.workplaces.map(workspace => ({
-        id: workspace.id,
-        name: workspace.name,
-        created: workspace.created,
-        lastModified: workspace.updated,
-        data: {
-          noteBlocks: [],
-          appConfig: {
-            title: '',
-            metadata: {
-              created: workspace.created,
-              updated: workspace.updated,
-            }
-          }
-        }
-      }))
+      workspaces: removeTypename(data.workplaces)
     };
 
     // Create and download file
-    const blob = new Blob([JSON.stringify(exportData, null, 2)], { 
-      type: 'application/json' 
+    const blob = new Blob([JSON.stringify(exportData, null, 2)], {
+      type: 'application/json'
     });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -56,7 +60,7 @@ function ImportExport({ onImportComplete }) {
 
     try {
       const text = await file.text();
-      const importData = JSON.parse(text);
+      const importData = removeTypename(JSON.parse(text));
 
       await importWorkspaces({
         variables: {
@@ -82,7 +86,7 @@ function ImportExport({ onImportComplete }) {
       <button onClick={handleExport} style={styles.button}>
         📤 Export
       </button>
-      
+
       <input
         ref={fileInputRef}
         type="file"

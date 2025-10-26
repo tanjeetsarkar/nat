@@ -4,7 +4,7 @@ from sqlalchemy import JSON, ForeignKey
 from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.orm import relationship
-
+from sqlalchemy.ext.mutable import MutableDict
 
 class Base(DeclarativeBase):
     pass
@@ -21,7 +21,7 @@ class Note(Base):
     order: Mapped[int] = mapped_column(default=0)
     metadata_col: Mapped[Dict[str, Any]] = mapped_column(
         "metadata",
-        JSON,
+        MutableDict.as_mutable(JSON),
         default=lambda: {
             "created": datetime.now().isoformat(),
             "updated": datetime.now().isoformat(),
@@ -40,7 +40,7 @@ class NoteBlock(Base):
     order: Mapped[int] = mapped_column(default=0)
     metadata_col: Mapped[Dict[str, Any]] = mapped_column(
         "metadata",
-        JSON,
+        MutableDict.as_mutable(JSON),
         default=lambda: {
             "created": datetime.now().isoformat(),
             "updated": datetime.now().isoformat(),
@@ -58,7 +58,7 @@ class AppData(Base):
     title: Mapped[Optional[str]]
     metadata_col: Mapped[Dict[str, Any]] = mapped_column(
         "metadata",
-        JSON,
+        MutableDict.as_mutable(JSON),
         default=lambda: {
             "created": datetime.now().isoformat(),
             "updated": datetime.now().isoformat(),
