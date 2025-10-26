@@ -2,7 +2,7 @@ import strawberry
 from typing import Optional, List
 from datetime import datetime
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
+from sqlalchemy import func, select
 
 from models import AppData, Note, NoteBlock, WorkPlace
 
@@ -22,6 +22,7 @@ class NoteType:
     priority: Optional[str]
     head: Optional[str]
     note: Optional[str]
+    order: int
     # metadata: MetadataType
 
     @strawberry.field
@@ -49,6 +50,7 @@ class NoteBlockType:
     id: strawberry.ID
     app_id: strawberry.ID
     head: str
+    order: int = 0
     # metadata: MetadataType
 
     @strawberry.field
@@ -63,7 +65,9 @@ class NoteBlockType:
     async def notes(self, info) -> List[NoteType]:
         """Resolver to fetch all Notes in this NoteBlock"""
         session: AsyncSession = info.context["session"]
-        result = await session.execute(select(Note).where(Note.block_id == self.id))
+        result = await session.execute(
+            select(Note).where(Note.block_id == self.id).order_by(Note.order)
+        )
         return result.scalars().all()
 
     @strawberry.field
@@ -157,6 +161,7 @@ class CreateNoteBlockInput:
 @strawberry.input
 class UpdateNoteBlockInput:
     head: Optional[str] = None
+    order: Optional[int] = None
 
 
 @strawberry.input
@@ -165,6 +170,7 @@ class CreateNoteInput:
     priority: Optional[str] = "medium"
     head: Optional[str] = None
     note: Optional[str] = None
+    order: Optional[int] = None
 
 
 @strawberry.input
@@ -173,6 +179,7 @@ class UpdateNoteInput:
     head: Optional[str] = None
     note: Optional[str] = None
     completed: Optional[bool] = None
+    order: Optional[int] = None
 
 
 # Import Input Types
@@ -385,9 +392,17 @@ class Mutation:
     ) -> NoteBlockType:
         """Create a new note block"""
         session: AsyncSession = info.context["session"]
+
+        result = await session.execute(
+            select(func.max(NoteBlock.order)).where(NoteBlock.app_id == input.app_id)
+        )
+
+        max_order = result.scalar() or 0
+
         note_block = NoteBlock(
             app_id=input.app_id,
             head=input.head,
+            order=max_order + 1,
             metadata_col={
                 "created": datetime.now().isoformat(),
                 "updated": datetime.now().isoformat(),
@@ -412,6 +427,8 @@ class Mutation:
 
         if input.head is not None:
             note_block.head = input.head
+        if input.order is not None:
+            note_block.order = input.order
         note_block.metadata_col["updated"] = datetime.now()
 
         await session.commit()
@@ -442,6 +459,7 @@ class Mutation:
             priority=input.priority,
             head=input.head,
             note=input.note,
+            order=input.order,
             metadata_col={
                 "created": datetime.now().isoformat(),
                 "updated": datetime.now().isoformat(),
@@ -473,6 +491,8 @@ class Mutation:
             note.note = input.note
         if input.completed is not None:
             note.metadata_col["completed"] = input.completed
+        if input.order is not None:
+            note.order = input.order
 
         note.metadata_col["updated"] = datetime.now()
 

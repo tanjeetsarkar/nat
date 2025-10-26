@@ -259,34 +259,27 @@ export function useNoteData(workspaceId) {
       console.error('Block not found');
       return;
     }
-    console.log("newNotesList", newNotesList)
     try {
-      // Update each note individually
-      for (const newNote of newNotesList) {
-        const existingNote = block.notes.find(n => n.id === newNote.id);
-        if (existingNote) {
-          // Check if note has changed (simple comparison)
-          const hasChanged =
-            existingNote.priority !== newNote.priority ||
-            existingNote.head !== newNote.head ||
-            existingNote.note !== newNote.note ||
-            existingNote.metadata?.completed !== newNote.metadata?.completed;
-
-          if (hasChanged) {
-            await updateNoteMutation({
-              variables: {
-                id: parseInt(newNote.id),
-                input: {
-                  priority: newNote.priority,
-                  head: newNote.head,
-                  note: newNote.note,
-                  completed: newNote.metadata?.completed
-                }
-              }
-            });
+      // Update all notes to persist the new order
+      // We need to update all notes because drag-and-drop changes the order
+      for (let i = 0; i < newNotesList.length; i++) {
+        const newNote = newNotesList[i];
+        await updateNoteMutation({
+          variables: {
+            id: parseInt(newNote.id),
+            input: {
+              priority: newNote.priority,
+              head: newNote.head,
+              note: newNote.note,
+              completed: newNote.metadata?.completed,
+              order: i
+            }
           }
-        }
+        });
       }
+
+      // Refetch to get the updated order from server
+      await refetch();
     } catch (err) {
       console.error('Error updating notes:', err);
       throw err;

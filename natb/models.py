@@ -18,6 +18,7 @@ class Note(Base):
     priority: Mapped[Optional[str]] = mapped_column(default="medium")
     head: Mapped[Optional[str]]
     note: Mapped[Optional[str]]
+    order: Mapped[int] = mapped_column(default=0)
     metadata_col: Mapped[Dict[str, Any]] = mapped_column(
         "metadata",
         JSON,
@@ -36,6 +37,7 @@ class NoteBlock(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     app_id: Mapped[int] = mapped_column(ForeignKey("tbl_app_data.id"))
     head: Mapped[str]
+    order: Mapped[int] = mapped_column(default=0)
     metadata_col: Mapped[Dict[str, Any]] = mapped_column(
         "metadata",
         JSON,
